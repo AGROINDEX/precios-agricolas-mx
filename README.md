@@ -5,8 +5,12 @@ agroalimentario mexicano. El dato oficial de mayoreo es la espina dorsal y el
 contraste; el producto que se esta construyendo es la **referencia de precio en
 origen**, que ninguna fuente publica cubre.
 
-Nombre y dominio definitivos pendientes. Este repositorio se renombra cuando se
-decidan.
+**En vivo:** https://agroindex.github.io/precios-agricolas-mx/
+
+Nombre y dominio definitivos pendientes. El hosting en GitHub Pages es
+provisional por la misma razon: cuando se compre el dominio, la publicacion se
+mueve a Cloudflare Pages sin tocar la ingesta ni el generador. Este repositorio
+se renombra cuando se decida la marca.
 
 ## Como esta armado
 

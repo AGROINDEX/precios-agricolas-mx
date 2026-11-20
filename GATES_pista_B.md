@@ -29,7 +29,7 @@ Cadena declarada: Python 3 en el shell del proyecto. Cada verificador es un scri
 - [x] B5: la base respeta el artículo 108 y no es espejo del acervo: ninguna fuente guarda más profundidad que la ventana declarada, y existe al menos un indicador derivado propio calculado sobre esa ventana
   CHECK: python tools/verificar_ventana.py
   EXPECT: ventana verificada · sin espejo del acervo y con derivado propio
-  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=de 1173 derivados con historia, 361 difieren del precio del dia | ventana verificada · sin espejo del acervo y con derivado propio
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=de 1256 derivados con historia, 361 difieren del precio del dia | ventana verificada · sin espejo del acervo y con derivado propio
 
 - [x] B6: el vigilante de fuentes congeladas apunta a las fuentes nuevas, lee el reporte de fetch versionado y falla cuando una fuente pasa el umbral de días sin fetch bueno, probado contra un reporte de control con una fuente congelada
   CHECK: python tools/verificar_frescura.py --control-positivo fixtures/pista_b/fetch_report_congelado.json

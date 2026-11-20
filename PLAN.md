@@ -52,3 +52,23 @@ amarillo y el dato se usa como referencia citada con atribucion.
 
 La base vive en `datos/pista_b/precios.db`, con ventana de noventa dias por
 fuente y poda en cada ingesta. Hoy trae 1,637 filas del 6 al 20 de noviembre.
+
+## Despliegue, 20 de noviembre de 2026
+
+La pista B esta publicada en https://agroindex.github.io/precios-agricolas-mx/
+desde el repositorio publico AGROINDEX/precios-agricolas-mx. Tres flujos en
+CI, probados en vivo ese mismo dia: ingesta diaria, vigilante de frescura y
+publicacion de la pagina.
+
+Decision de repositorio, que estaba abierta en la seccion 5: repo nuevo y
+aparte, no carpeta dentro de agropatent-index. Pesaron dos cosas, que la
+marca ya se decidio aparte y que el despliegue de AgroPatent viene ajustado
+de tamano.
+
+Hosting provisional en GitHub Pages porque las credenciales de Cloudflare
+son secretos del repositorio de AgroPatent y no se pueden leer ni copiar.
+El cambio a Cloudflare Pages no toca la ingesta ni el generador.
+
+Los registros del piloto con datos personales quedan fuera del repositorio
+por `.gitignore`, porque el repositorio es publico y esos archivos llevan
+nombres, telefonos y lo que cada persona contesto.
