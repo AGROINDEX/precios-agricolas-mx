@@ -26,6 +26,7 @@ RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(RAIZ, "ingesta"))
 
 from check_fuentes_stale import evaluar  # noqa: E402
+from frescura_real import VEREDICTOS, frase, medir  # noqa: E402
 from comun import conectar  # noqa: E402
 
 SALIDA = os.path.join(RAIZ, "web", "index.html")
@@ -58,6 +59,13 @@ th { font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spa
 td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 tr.rancia td { opacity: 0.55; }
 .marca-rancia { color: var(--alerta); font-size: 0.78rem; }
+.pulso { display: inline-block; border-radius: 999px; padding: 1px 9px; font-size: 0.78rem;
+         border: 1px solid var(--borde); }
+.pulso.viva { border-color: var(--acento); color: var(--acento); }
+.pulso.parcial { border-color: #9a7b12; color: #9a7b12; }
+.pulso.estancada { border-color: var(--alerta); color: var(--alerta); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pulso.parcial {
+         border-color: #d8b544; color: #d8b544; } }
 .sube { color: var(--alerta); } .baja { color: var(--acento); }
 footer { margin-top: 48px; border-top: 1px solid var(--borde); padding-top: 14px;
          color: var(--suave); font-size: 0.85rem; }
@@ -87,6 +95,8 @@ def construir(ruta_base=None, ruta_reporte=None, salida=SALIDA):
             "SELECT clave, nombre, atribucion, url_base, licencia_veredicto, ventana_dias FROM fuentes"
         )
     }
+
+    movimiento = medir(conexion)
 
     with open(ruta_reporte or REPORTE, encoding="utf-8") as archivo:
         reporte = json.load(archivo)
@@ -120,7 +130,7 @@ def construir(ruta_base=None, ruta_reporte=None, salida=SALIDA):
                 """,
                 (clave, ultima, mercado),
             ).fetchall()
-            bloques.append((clave, mercado, ultima, filas))
+            bloques.append((clave, mercado, ultima, filas, movimiento.get(clave, {}).get(mercado)))
     conexion.close()
 
     generado = datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d %H:%M %Z")
@@ -149,7 +159,7 @@ def construir(ruta_base=None, ruta_reporte=None, salida=SALIDA):
     if not bloques:
         partes.append('<div class="aviso">No hay datos cargados todavia.</div>')
 
-    for clave, mercado, fecha, filas in bloques:
+    for clave, mercado, fecha, filas, pulso in bloques:
         fuente = fuentes[clave]
         rancia = clave in claves_congeladas
         hoy = date.today().isoformat()
@@ -168,6 +178,12 @@ def construir(ruta_base=None, ruta_reporte=None, salida=SALIDA):
             f"ventana publicada de {fuente['ventana']} dias</p>"
         )
         partes.append('<div class="envoltura">')
+        if pulso:
+            partes.append(
+                f'<p class="nota"><span class="pulso {pulso["veredicto"]}">'
+                f'{escapar(VEREDICTOS[pulso["veredicto"]])}</span> {escapar(frase(pulso))}. '
+                "Esto mide el movimiento real de los numeros, no la fecha que la fuente declara.</p>"
+            )
         partes.append(
             "<table><thead><tr><th>Producto</th><th class='oculta-chico'>Calidad</th>"
             "<th>Presentacion</th><th>Origen</th><th class='num'>Min</th><th class='num'>Frec</th>"
@@ -211,6 +227,14 @@ def construir(ruta_base=None, ruta_reporte=None, salida=SALIDA):
         partes.append("</tbody></table></div>")
 
     partes.append("<footer>")
+    partes.append(
+        "<p>La etiqueta de movimiento de cada plaza compara el valor de cada producto contra el "
+        "dia publicado anterior y cuenta cuantos dias lleva sin cambiar. Una plaza marcada como "
+        "que casi no se mueve no afirma que la fuente haya dejado de levantar el dato: afirma "
+        "que sus numeros llevan dias quietos, y que conviene tomarlos como referencia gruesa. "
+        "Se marca asi cuando la mitad o mas de sus productos no cambio ni una vez en la ventana, "
+        "o cuando menos del cinco por ciento se movio en el ultimo corte.</p>"
+    )
     partes.append(
         "<p>Una advertencia que importa al comparar plazas: el SNIIM publica el precio por "
         "kilogramo calculado y la Central de Abasto lo publica por presentacion comercial. "

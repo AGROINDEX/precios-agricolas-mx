@@ -25,6 +25,7 @@ RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(RAIZ, "ingesta"))
 
 from comun import conectar  # noqa: E402
+from frescura_real import medir  # noqa: E402
 
 CARPETA = os.path.join(RAIZ, "boletin")
 
@@ -81,6 +82,7 @@ def generar(producto, plaza, contraste, ruta_base=None):
         conexion.close()
         raise SystemExit(f"no hay ninguna fila de {producto} en {plaza}")
     otra = ultima_fila(conexion, producto, contraste) if contraste else None
+    movimiento = medir(conexion)
     conexion.close()
 
     (
@@ -142,6 +144,17 @@ def generar(producto, plaza, contraste, ruta_base=None):
         )
     lineas.append("")
 
+    pulso = movimiento.get(fuente, {}).get(plaza)
+    if pulso and pulso["veredicto"] in ("estancada", "parcial"):
+        edad = pulso["mediana_edad_valor"]
+        lineas.append(
+            "**Cuidado con este numero.** En esta plaza los precios publicados llevan dias "
+            f"quietos: la mitad no ha cambiado en {edad:.0f} dias o mas. La fecha del corte es "
+            "de ayer o de hoy, pero el valor no se mueve, asi que conviene tomarlo como "
+            "referencia gruesa y no como el precio de la jornada."
+        )
+        lineas.append("")
+
     if otra is not None:
         (
             id_otra, fecha_otra, _n2, _p2, _o2, _c2,
@@ -169,6 +182,19 @@ def generar(producto, plaza, contraste, ruta_base=None):
                 f"Son {pesos(abs(brecha))} pesos {rumbo}, es decir {abs(porcentaje):.1f} por ciento "
                 "de diferencia entre las dos plazas."
             )
+            pulso_otra = movimiento.get(fuente_otra, {}).get(contraste)
+            if (
+                pulso
+                and pulso_otra
+                and pulso["veredicto"] in ("estancada", "parcial")
+                and pulso_otra["veredicto"] == "viva"
+            ):
+                lineas.append("")
+                lineas.append(
+                    "Esa diferencia hay que leerla con reserva: la plaza de destino mueve sus "
+                    "precios casi a diario y la de origen no, asi que parte de la brecha puede "
+                    "ser dato quieto de un lado y no mercado del otro."
+                )
             if fecha_otra != fecha:
                 lineas.append("")
                 lineas.append(

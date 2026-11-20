@@ -45,6 +45,18 @@ la respalda. Las fichas estan en `licencias/`. Hoy las dos fuentes estan en
 amarillo: usables con atribucion visible, pendientes de autorizacion expresa
 para monetizar el acervo. Las consultas escritas estan en `correspondencia/`.
 
+**Frescura real, no solo la declarada.** La fecha de un corte la pone la
+fuente, y una fuente puede republicar el mismo numero con la fecha de hoy. Cada
+plaza lleva en la pagina su veredicto de movimiento, calculado sobre cuantos
+productos cambiaron de precio contra el dia publicado anterior y cuantos dias
+lleva cada valor sin moverse. Hoy Iztapalapa se mueve y Morelia casi no: 70 por
+ciento de sus productos no cambio ni una vez en la ventana y la mitad de sus
+precios lleva catorce dias o mas quieto, aunque su corte diga que es de hoy.
+
+```powershell
+python ingesta/frescura_real.py
+```
+
 **Frescura declarada siempre.** Cada precio lleva su fecha y su fuente. Si una
 fuente se congela, la pagina lo dice en la cara del usuario en vez de mostrar el
 ultimo dato bueno como si fuera de hoy. El vigilante corre en su propio flujo de

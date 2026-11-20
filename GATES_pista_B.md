@@ -61,6 +61,11 @@ Cadena declarada: Python 3 en el shell del proyecto. Cada verificador es un scri
   EXPECT: tipografia verificada · control positivo rechazado como se esperaba
   EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=control positivo rechazado por ['—'] | tipografia verificada · control positivo rechazado como se esperaba
 
+- [x] B13: la frescura real de cada plaza queda medida sobre el movimiento de los valores y no sobre la fecha declarada, con el veredicto por plaza visible en la página, y el verificador recalcula las cifras desde las filas crudas y detecta una plaza estancada de control
+  CHECK: python tools/verificar_frescura_real.py --control-estancado
+  EXPECT: frescura real verificada · recalculo coincide y plaza estancada detectada
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=veredicto por plaza visible en la pagina publicada | frescura real verificada · recalculo coincide y plaza estancada detectada
+
 - [ ] B12: la consulta escrita al SNIIM está enviada a info.sniim@economia.gob.mx con fecha y copia del texto en el expediente, y la petición de permiso a la Central de Abasto está enviada o registrada como pendiente con fecha
   EVIDENCE: NO CUMPLIDO · textos redactados el 20 de noviembre de 2026 en correspondencia/consulta_sniim.md y correspondencia/permiso_ficeda.md, los dos sin enviar. El envío es del fundador: esta sesión no manda correo en su nombre. Para la FICEDA falta además el destinatario, que no está publicado en el visor y se pide por el canal de atención de ficeda.com.mx. Mientras el gate siga abierto, las dos fuentes quedan en amarillo y el dato se usa como referencia citada con atribución, no como acervo redistribuido.
 
