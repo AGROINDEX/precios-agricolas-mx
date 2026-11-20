@@ -34,6 +34,27 @@ def ruta_datos_a(nombre):
     return os.path.join(carpeta, nombre)
 
 
+def pagina_generada():
+    """Ruta de la pagina a revisar, construyendola si no esta.
+
+    La pagina no se versiona: es artefacto generado desde la base. En un clon
+    recien hecho no existe, y un gate que fallara por eso estaria midiendo el
+    orden de los comandos y no el producto. Se construye en carpeta temporal y
+    se revisa esa copia, que es la misma que publica el CI.
+    """
+    import tempfile
+
+    publicada = os.path.join(RAIZ, "web", "index.html")
+    if os.path.exists(publicada):
+        return publicada
+    sys.path.insert(0, os.path.join(RAIZ, "web"))
+    import construir
+
+    destino = os.path.join(tempfile.mkdtemp(prefix="gate_pagina_"), "index.html")
+    construir.construir(None, None, destino)
+    return destino
+
+
 class Fallo(Exception):
     pass
 

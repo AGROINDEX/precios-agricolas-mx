@@ -9,7 +9,9 @@ on:
   push:
     branches: [main]
     paths:
-      - "web/**"
+      - "datos/pista_b/**"
+      - "web/construir.py"
+      - "ingesta/**"
       - ".github/workflows/publicar-pagina.yml"
   # La ingesta diaria empuja la pagina nueva con el token de Actions, y un push
   # hecho con ese token no dispara otros flujos. Por eso se escucha el final de
@@ -37,6 +39,18 @@ jobs:
       url: ${{ steps.despliegue.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # El disparo por workflow_run llega con la referencia del momento en
+          # que arranco la ingesta, que es anterior a su propio push. Sin esto,
+          # la pagina publicada va siempre una corrida atras.
+          ref: main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Construir la pagina desde la base
+        run: python web/construir.py
 
       - name: Comprobar que la pagina existe y no viene vacia
         # Publicar una pagina vacia es peor que no publicar: el usuario no

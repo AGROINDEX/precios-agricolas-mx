@@ -11,7 +11,7 @@ import os
 import sys
 
 import gate_util
-from gate_util import exigir, ruta
+from gate_util import exigir, pagina_generada, ruta
 
 MARCADOR = "tipografia verificada · control positivo rechazado como se esperaba"
 
@@ -44,6 +44,10 @@ def recorrer(rutas):
 def verificar(rutas, control):
     detalles = []
     archivos = recorrer(rutas)
+    # La pagina publicada es texto de cara al usuario aunque no se versione.
+    pagina = pagina_generada()
+    if pagina not in archivos:
+        archivos.append(pagina)
     exigir(archivos, f"las rutas {rutas} no contienen archivos de texto que revisar")
 
     sucios = []

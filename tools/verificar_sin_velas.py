@@ -18,10 +18,10 @@ import re
 import sys
 
 import gate_util
-from gate_util import exigir, ruta
+from gate_util import exigir, pagina_generada
 
 MARCADOR = "ausencia de velas verificada · control positivo rechazado como se esperaba"
-PAGINA = ruta("web", "index.html")
+
 
 # Senales de grafica financiera. Se busca por nombre de tecnica y por libreria,
 # porque cualquiera de las dos vias produce el mismo claim falso.
@@ -54,8 +54,8 @@ def velas_en(texto):
 
 def verificar(control):
     detalles = []
-    exigir(os.path.exists(PAGINA), f"no existe la pagina en {PAGINA}")
-    with open(PAGINA, encoding="utf-8") as archivo:
+    camino = pagina_generada()
+    with open(camino, encoding="utf-8") as archivo:
         pagina = archivo.read()
 
     # La mencion que explica por que NO hay velas no cuenta como vela. Se quita

@@ -7,6 +7,12 @@ datos/pista_a/bitacora.json
 
 # El formato de esos archivos si se versiona: esta en datos/pista_a/README.md.
 
+# La pagina es artefacto generado, no fuente. Se construye al publicar desde
+# datos/pista_b/precios.db, que si se versiona. Versionarla tambien invita al
+# conflicto entre lo que escribe el CI y lo que escribe quien trabaja local, y
+# deja la pagina en vivo una corrida atras.
+web/index.html
+
 # Python
 __pycache__/
 *.pyc
