@@ -1,0 +1,69 @@
+name: ingesta-diaria
+
+# Ingesta incremental de las dos fuentes, una vez al dia. Este flujo si puede
+# desplegar: su trabajo es dejar el dato y la pagina al dia.
+#
+# Lo que NO hace, a proposito: no corre el vigilante de fuentes congeladas. Si
+# lo corriera aqui, una fuente congelada tumbaria el despliegue y el tablero se
+# quedaria sin actualizar justo el dia en que hay algo que avisar. El vigilante
+# vive en vigilante-diario.yml.
+
+on:
+  schedule:
+    # 13:00 UTC es cerca de las 07:00 en el centro de Mexico, despues del corte
+    # de la madrugada en las centrales y antes de que abra la jornada comercial.
+    - cron: "0 13 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ingesta-diaria
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  ingesta:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Ingesta del SNIIM
+        run: python ingesta/sniim.py
+        continue-on-error: true
+
+      - name: Ingesta de la Central de Abasto
+        run: python ingesta/ficeda.py
+        continue-on-error: true
+
+      - name: Indicadores propios
+        run: python ingesta/derivados.py
+
+      - name: Construir la pagina
+        run: python web/construir.py
+
+      - name: Guardar la memoria entre corridas
+        # Se versionan tres cosas y cada una por una razon distinta:
+        #
+        #   _fetch_report.json  le permite al vigilante saber cuando fue el
+        #                       ultimo fetch BUENO, no el ultimo intento.
+        #   precios.db          el corredor de CI es efimero. Sin la base
+        #                       versionada, cada corrida empezaria vacia y la
+        #                       mediana de siete dias se calcularia sobre un
+        #                       solo dia, que es un numero que miente.
+        #   web/index.html      es el artefacto que se publica.
+        #
+        # La base se mantiene chica por diseno: la poda de ventana corre en cada
+        # ingesta. El dia que crezca de mas, el reemplazo es Supabase, no un
+        # archivo mas grande en el repositorio.
+        run: |
+          git config user.name "ingesta-diaria"
+          git config user.email "noreply@users.noreply.github.com"
+          git add datos/pista_b/_fetch_report.json datos/pista_b/precios.db web/index.html
+          git diff --staged --quiet || git commit -m "ingesta diaria $(date -u +%F)"
+          git push

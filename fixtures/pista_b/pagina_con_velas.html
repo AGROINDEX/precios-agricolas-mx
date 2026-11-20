@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Control positivo · pagina con velas</title>
+  <!--
+    Control positivo de B8. Esta pagina hace justo lo que el gate prohibe:
+    presenta el rango minimo y maximo del dia como si fuera una vela de
+    transaccion, con libreria de graficas financieras incluida. El verificador
+    tiene que rechazarla. Si pasa en verde, el verificador no sirve y la
+    ausencia de velas en la pagina real no prueba nada.
+  -->
+  <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+  <h1>Limon con semilla, cotizacion intradia</h1>
+  <div id="grafica"></div>
+  <script>
+    const grafica = LightweightCharts.createChart(document.getElementById("grafica"));
+    const serie = grafica.addCandlestickSeries();
+    serie.setData([
+      { time: "2026-11-18", open: 15.2, high: 15.47, low: 15.2, close: 15.33 },
+      { time: "2026-11-19", open: 15.33, high: 16.1, low: 15.0, close: 15.8 }
+    ]);
+  </script>
+  <p>Grafica de velas OHLC construida con el minimo y el maximo publicados.</p>
+</body>
+</html>

@@ -1,0 +1,18 @@
+# Datos personales del piloto. El repositorio es publico y estos archivos
+# llevan nombres, telefonos y lo que cada persona contesto. No entran, ni
+# siquiera vacios con un registro de prueba dentro.
+datos/pista_a/cohorte_vendedor.json
+datos/pista_a/cohorte_comprador.json
+datos/pista_a/bitacora.json
+
+# El formato de esos archivos si se versiona: esta en datos/pista_a/README.md.
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Temporales
+*.tmp
+.DS_Store

@@ -1,0 +1,48 @@
+name: vigilante-diario
+
+# Vigilante de fuentes congeladas, en su propio flujo y sin despliegue.
+#
+# POR QUE SEPARADO. En AgroPatentIndex un fetcher estuvo roto diecinueve dias
+# sin que nadie lo notara, porque el runner conservaba la ultima copia buena y
+# la corrida terminaba en verde. Aqui fallar es el producto: este flujo se pone
+# en rojo y GitHub si notifica un flujo rojo. Como no despliega nada, fallar no
+# deja el tablero sin actualizar.
+
+on:
+  schedule:
+    # Media hora despues de la ingesta, para medir lo que la ingesta acaba de
+    # dejar en el reporte de fetch.
+    - cron: "30 13 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: vigilante-diario
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  frescura:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Control positivo del vigilante
+        # Primero se prueba que el vigilante SI detecta una fuente congelada.
+        # Sin esto, un verde del paso siguiente no distingue entre fuentes sanas
+        # y un vigilante roto.
+        run: |
+          if python ingesta/check_fuentes_stale.py --reporte fixtures/pista_b/fetch_report_congelado.json; then
+            echo "::error::el vigilante paso en verde el control positivo: esta roto"
+            exit 1
+          fi
+          echo "control positivo detectado como congelado"
+
+      - name: Frescura de las fuentes en vivo
+        run: python ingesta/check_fuentes_stale.py

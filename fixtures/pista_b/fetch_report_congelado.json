@@ -1,0 +1,20 @@
+{
+  "actualizado_en": "2026-11-20T06:00:00+00:00",
+  "comentario": "Control positivo del vigilante. SNIIM_FYH lleva semanas respondiendo 200 con la tabla vacia, que es como una fuente se congela sin avisar, y FICEDA_CDMX nunca tuvo un fetch bueno. El vigilante tiene que marcar las dos y salir con codigo 1. Si este archivo pasa en verde, el vigilante no sirve.",
+  "fuentes": {
+    "FICEDA_CDMX": {
+      "critical": true,
+      "nombre": "Central de Abasto de la Ciudad de Mexico · FICEDA",
+      "ultimo_detalle": "HTTPError 500",
+      "ultimo_intento": "2026-11-20T06:00:00+00:00"
+    },
+    "SNIIM_FYH": {
+      "critical": true,
+      "filas_ultimo_fetch": 0,
+      "nombre": "SNIIM · Secretaria de Economia, frutas y hortalizas",
+      "ultimo_detalle": "200 con cero filas",
+      "ultimo_fetch_bueno": "2026-10-28T06:00:00+00:00",
+      "ultimo_intento": "2026-11-20T06:00:00+00:00"
+    }
+  }
+}

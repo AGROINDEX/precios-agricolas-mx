@@ -1,0 +1,57 @@
+name: publicar-pagina
+
+# Publica web/ en GitHub Pages. Hosting provisional y a proposito: deja la
+# pagina en vivo sin pedir ningun secreto, porque usa el token del propio
+# repositorio. Cuando se compre el dominio, esto se cambia por Cloudflare Pages
+# sin tocar la ingesta ni el generador.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+      - ".github/workflows/publicar-pagina.yml"
+  # La ingesta diaria empuja la pagina nueva con el token de Actions, y un push
+  # hecho con ese token no dispara otros flujos. Por eso se escucha el final de
+  # la ingesta en vez de confiar en el push.
+  workflow_run:
+    workflows: [ingesta-diaria]
+    types: [completed]
+  workflow_dispatch:
+
+concurrency:
+  group: publicar-pagina
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Comprobar que la pagina existe y no viene vacia
+        # Publicar una pagina vacia es peor que no publicar: el usuario no
+        # distingue entre sin datos y sitio roto.
+        run: |
+          test -f web/index.html
+          grep -q "Precios de hoy" web/index.html
+          grep -q "no es precio en finca" web/index.html
+          echo "pagina lista para publicar"
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+
+      - id: despliegue
+        uses: actions/deploy-pages@v4
