@@ -57,6 +57,16 @@ precios lleva catorce dias o mas quieto, aunque su corte diga que es de hoy.
 python ingesta/frescura_real.py
 ```
 
+El vigilante diario avisa cuando una plaza DEJA de moverse, no mientras sigue
+quieta: una plaza quieta conocida queda como nota y solo la transicion pone la
+corrida en rojo. Para saber como estaba antes no guarda estado, vuelve a medir
+recortando la base al dia publicado anterior, asi que el aviso de cualquier dia
+se puede recalcular.
+
+```powershell
+python ingesta/check_plazas_quietas.py
+```
+
 **Frescura declarada siempre.** Cada precio lleva su fecha y su fuente. Si una
 fuente se congela, la pagina lo dice en la cara del usuario en vez de mostrar el
 ultimo dato bueno como si fuera de hoy. El vigilante corre en su propio flujo de

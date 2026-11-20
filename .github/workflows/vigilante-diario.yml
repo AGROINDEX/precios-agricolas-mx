@@ -46,3 +46,11 @@ jobs:
 
       - name: Frescura de las fuentes en vivo
         run: python ingesta/check_fuentes_stale.py
+
+      - name: Plazas que dejaron de moverse
+        # Avisa del cambio de estado, no del estado: una plaza quieta conocida
+        # se reporta como nota y solo la transicion pone la corrida en rojo.
+        # Corre aunque el paso anterior falle, porque son dos preguntas
+        # distintas: una mira la descarga y la otra mira el dato.
+        if: always()
+        run: python ingesta/check_plazas_quietas.py

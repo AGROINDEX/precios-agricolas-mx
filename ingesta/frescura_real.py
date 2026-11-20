@@ -56,15 +56,22 @@ VEREDICTOS = {
 }
 
 
-def series_por_plaza(conexion):
+def series_por_plaza(conexion, hasta=None):
+    """Series por plaza y producto, opcionalmente recortadas a una fecha.
+
+    `hasta` existe para poder preguntar que veredicto habria dado esta misma
+    medida el dia publicado anterior. Asi la base es su propia memoria y el
+    vigilante puede detectar el cambio de estado sin guardar un archivo aparte.
+    """
     filas = conexion.execute(
         """
         SELECT fuente, mercado, producto, fecha_dato, AVG(precio_frec)
         FROM precios
-        WHERE precio_frec IS NOT NULL
+        WHERE precio_frec IS NOT NULL AND (? IS NULL OR fecha_dato <= ?)
         GROUP BY fuente, mercado, producto, fecha_dato
         ORDER BY fuente, mercado, producto, fecha_dato
-        """
+        """,
+        (hasta, hasta),
     ).fetchall()
     series = {}
     for fuente, mercado, producto, fecha, valor in filas:
@@ -145,8 +152,8 @@ def medir_plaza(productos):
     }
 
 
-def medir(conexion):
-    series = series_por_plaza(conexion)
+def medir(conexion, hasta=None):
+    series = series_por_plaza(conexion, hasta)
     medidas = {}
     for (fuente, mercado), productos in series.items():
         medidas.setdefault(fuente, {})[mercado] = medir_plaza(productos)

@@ -66,6 +66,11 @@ Cadena declarada: Python 3 en el shell del proyecto. Cada verificador es un scri
   EXPECT: frescura real verificada · recalculo coincide y plaza estancada detectada
   EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=veredicto por plaza visible en la pagina publicada | frescura real verificada · recalculo coincide y plaza estancada detectada
 
+- [x] B14: el vigilante avisa cuando una plaza se queda quieta y falla solo cuando el veredicto empeora respecto del día publicado anterior, no mientras el estado persiste, probado contra tres plazas de control: una que se estanca, una estancada desde siempre y una que se mueve
+  CHECK: python tools/verificar_aviso_plaza_quieta.py
+  EXPECT: aviso de plaza quieta verificado · falla en la transicion y no en el estado persistente
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=cableado en vigilante-diario.yml | aviso de plaza quieta verificado · falla en la transicion y no en el estado persistente
+
 - [ ] B12: la consulta escrita al SNIIM está enviada a info.sniim@economia.gob.mx con fecha y copia del texto en el expediente, y la petición de permiso a la Central de Abasto está enviada o registrada como pendiente con fecha
   EVIDENCE: NO CUMPLIDO · textos redactados el 20 de noviembre de 2026 en correspondencia/consulta_sniim.md y correspondencia/permiso_ficeda.md, los dos sin enviar. El envío es del fundador: esta sesión no manda correo en su nombre. Para la FICEDA falta además el destinatario, que no está publicado en el visor y se pide por el canal de atención de ficeda.com.mx. Mientras el gate siga abierto, las dos fuentes quedan en amarillo y el dato se usa como referencia citada con atribución, no como acervo redistribuido.
 
