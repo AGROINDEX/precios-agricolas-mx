@@ -28,6 +28,7 @@ sys.path.insert(0, os.path.join(RAIZ, "ingesta"))
 from check_fuentes_stale import evaluar  # noqa: E402
 from frescura_real import VEREDICTOS, frase, medir  # noqa: E402
 from comun import conectar  # noqa: E402
+from grafica import ESTILO_GRAFICA, grafica  # noqa: E402
 
 SALIDA = os.path.join(RAIZ, "web", "index.html")
 REPORTE = os.path.join(RAIZ, "datos", "pista_b", "_fetch_report.json")
@@ -57,6 +58,10 @@ th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--bord
 th { font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em;
      color: var(--suave); }
 td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.historia { padding: 3px 8px; }
+.grafica { color: #2f6fae; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .grafica { color: #76b2e8; } }
+.sin-serie { color: var(--suave); font-size: 0.74rem; }
 tr.rancia td { opacity: 0.55; }
 .marca-rancia { color: var(--alerta); font-size: 0.78rem; }
 .pulso { display: inline-block; border-radius: 999px; padding: 1px 9px; font-size: 0.78rem;
@@ -130,7 +135,27 @@ def construir(ruta_base=None, ruta_reporte=None, salida=SALIDA):
                 """,
                 (clave, ultima, mercado),
             ).fetchall()
-            bloques.append((clave, mercado, ultima, filas, movimiento.get(clave, {}).get(mercado)))
+            # Historico crudo de la plaza, un punto por dia PUBLICADO. Se lee de
+            # una sola consulta y se reparte por producto, en vez de una consulta
+            # por fila, que con 250 cotizaciones serian 250 viajes a la base.
+            series = {}
+            for producto, presentacion, fecha_punto, minimo, maximo, frecuente in conexion.execute(
+                "SELECT producto, presentacion, fecha_dato, precio_min, precio_max, precio_frec"
+                " FROM precios WHERE fuente = ? AND mercado = ? AND precio_frec IS NOT NULL"
+                " ORDER BY fecha_dato",
+                (clave, mercado),
+            ):
+                series.setdefault((producto, presentacion), []).append(
+                    {"fecha": fecha_punto, "min": minimo, "max": maximo, "frec": frecuente}
+                )
+            bloques.append(
+                (clave, mercado, ultima, filas, movimiento.get(clave, {}).get(mercado), series)
+            )
+    # El corte mas fresco arriba. Ordenar por clave de fuente dejaba primero a la
+    # plaza que publico ayer y con un solo dia de historico, que es la peor
+    # carta de presentacion posible para una pagina que vende frescura.
+    bloques.sort(key=lambda bloque: (bloque[2], len(bloque[3])), reverse=True)
+
     conexion.close()
 
     generado = datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d %H:%M %Z")
@@ -139,7 +164,7 @@ def construir(ruta_base=None, ruta_reporte=None, salida=SALIDA):
         '<html lang="es"><head><meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
         "<title>Precios de hoy</title>",
-        f"<style>{ESTILO}</style></head><body><main>",
+        f"<style>{ESTILO}{ESTILO_GRAFICA}</style></head><body><main>",
         "<h1>Precios de hoy</h1>",
         '<p class="sub">Precio de mayoreo en central de abasto, que no es precio en finca: '
         "es lo que se paga en la plaza de destino, y el productor cobra menos que esto. "
@@ -159,7 +184,7 @@ def construir(ruta_base=None, ruta_reporte=None, salida=SALIDA):
     if not bloques:
         partes.append('<div class="aviso">No hay datos cargados todavia.</div>')
 
-    for clave, mercado, fecha, filas, pulso in bloques:
+    for clave, mercado, fecha, filas, pulso, series in bloques:
         fuente = fuentes[clave]
         rancia = clave in claves_congeladas
         hoy = date.today().isoformat()
@@ -186,8 +211,9 @@ def construir(ruta_base=None, ruta_reporte=None, salida=SALIDA):
             )
         partes.append(
             "<table><thead><tr><th>Producto</th><th class='oculta-chico'>Calidad</th>"
-            "<th>Presentacion</th><th>Origen</th><th class='num'>Min</th><th class='num'>Frec</th>"
-            "<th class='num'>Max</th><th class='num'>Mediana 7d</th><th class='num'>Var. 1d</th>"
+            "<th>Presentacion</th><th>Origen</th><th>Historico publicado</th>"
+            "<th class='num'>Min</th><th class='num'>Frec</th>"
+            "<th class='num'>Max</th><th class='num'>Var. 1d</th>"
             "<th class='num oculta-chico'>Amplitud</th><th>Fecha</th></tr></thead><tbody>"
         )
         for fila in filas:
@@ -202,7 +228,7 @@ def construir(ruta_base=None, ruta_reporte=None, salida=SALIDA):
                 fecha_dato,
                 _base,
                 _url,
-                mediana,
+                _mediana,
                 variacion,
                 amplitud,
                 _n,
@@ -218,8 +244,9 @@ def construir(ruta_base=None, ruta_reporte=None, salida=SALIDA):
                 f"<tr{clase}><td>{escapar(producto)}{marca}</td>"
                 f"<td class='oculta-chico'>{escapar(calidad)}</td>"
                 f"<td>{escapar(presentacion)}</td><td>{escapar(origen)}</td>"
+                f"<td class='historia'>{grafica(series.get((producto, presentacion), []), ancho=168, alto=42, etiquetas=False)}</td>"
                 f"<td class='num'>{pesos(minimo)}</td><td class='num'>{pesos(frecuente)}</td>"
-                f"<td class='num'>{pesos(maximo)}</td><td class='num'>{pesos(mediana)}</td>"
+                f"<td class='num'>{pesos(maximo)}</td>"
                 f"{celda_var}"
                 f"<td class='num oculta-chico'>{'' if amplitud is None else f'{amplitud:.2f}'}</td>"
                 f"<td>{escapar(fecha_dato)}</td></tr>"
@@ -242,10 +269,17 @@ def construir(ruta_base=None, ruta_reporte=None, salida=SALIDA):
         "Cada bloque dice sobre que base esta cotizado.</p>"
     )
     partes.append(
-        "<p>Mediana de 7 dias, variacion contra el dia publicado anterior y amplitud relativa "
-        "son calculo propio sobre una ventana corta, no dato de la fuente. El precio puntual se "
-        "cita con su fecha y su fuente, y el acervo historico se consulta en la fuente, que es "
-        "quien lo elaboro.</p>"
+        "<p>La grafica une el precio frecuente de cada dia publicado dentro de la ventana, un "
+        "valor por dia, con la dispersion del mismo dia en gris detras. El eje son dias "
+        "publicados y no dias de calendario: un domingo sin publicacion no deja hueco ni se "
+        "rellena con el valor del viernes. No son velas: no existe apertura, cierre, maximo "
+        "intradia ni volumen que las sostengan.</p>"
+    )
+    partes.append(
+        "<p>La variacion contra el dia publicado anterior y la amplitud relativa son calculo "
+        "propio sobre la ventana, no dato de la fuente. El precio puntual se cita con su fecha "
+        "y su fuente, y el acervo historico completo se consulta en la fuente, que es quien lo "
+        "elaboro.</p>"
     )
     for clave in sorted(fuentes):
         fuente = fuentes[clave]

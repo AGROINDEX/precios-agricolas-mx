@@ -22,3 +22,6 @@ venv/
 # Temporales
 *.tmp
 .DS_Store
+
+# Maquetas de diseno: artefacto generado desde la base, como web/index.html.
+diseno/propuesta_*.html

@@ -99,3 +99,14 @@ node $env:USERPROFILE\.claude\skills\unlazy\scripts\gate-check.mjs --status --ro
 
 Los registros del piloto con datos personales no se versionan, por eso
 `datos/pista_a/` solo trae su README con el formato.
+
+## Historico publicado
+
+Cada producto muestra su serie de precios de los dias publicados dentro de la
+ventana declarada, con la dispersion del dia detras. No hay mediana movil en la
+vista: el calculo derivado se conserva en la base, que es lo que sostiene el
+gate del articulo 108, pero la columna que el usuario mira es la serie cruda.
+
+La ventana se relleno desde la fuente con `python ingesta/sniim.py --dias 90`,
+que es lo mismo que hace la ingesta diaria pero hacia atras y nunca mas alla de
+la ventana declarada en `ingesta/comun.py`.

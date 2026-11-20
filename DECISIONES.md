@@ -37,6 +37,26 @@ que hizo creíble el deck anterior.
 Lo que manda sobre la fase 3: cuando se abra el marketplace, los dos lados ya
 están dentro y ya se conocen.
 
+## La mediana móvil sale de la vista, el histórico entra
+
+Decidida el 20 de noviembre de 2026, a petición del fundador: la mediana de 7
+días no le sirve, lo que sirve es ver el histórico.
+
+La mediana se **quita** de la vista en vez de dejarla al lado. Una columna que
+nadie usa ocupa el lugar de la que sí, y en una tabla de once columnas ese
+lugar es caro. El cálculo derivado **se conserva en la base**: es lo que
+sostiene el gate B5 del artículo 108, donde la defensa es que publicamos
+indicadores propios y no un espejo del acervo.
+
+Para que la gráfica tuviera de dónde dibujarse se rellenó la ventana declarada
+desde la fuente, 90 días de calendario que son 62 días publicados por plaza. No
+es ampliar la ventana: es llenar la que ya estaba declarada, y la poda sigue
+cortando todo lo que la rebase.
+
+Lo que esta decisión manda sobre el ledger: gates B15, profundidad de la
+ventana, y B16, la gráfica es la serie recalculada desde las filas crudas y no
+un adorno.
+
 ## Abiertas
 
 | Decisión | Por qué importa | Dueño |
