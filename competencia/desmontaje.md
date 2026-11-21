@@ -43,6 +43,16 @@ para dimensionar una brecha historica, no para negociar manana por la mañana.
 Si al entrar resulta que el dato de productor se actualiza a diario y por plaza,
 la tesis del hueco cambia y hay que decirlo, no acomodar la evidencia.
 
+**Actualizacion del 21 de noviembre de 2026, y cierra esa duda sin pagar.** Se
+investigo la fuente en vez del producto: el precio medio rural del DGSIAP, antes
+SIAP, **solo existe en el cierre agricola ANUAL**, con 7.5 meses de rezago. El
+avance mensual de siembras y cosechas no tiene columna de precio. Asi que ese
+21.34 por kilo de aguacate no puede estar diario, no porque no hayan querido,
+sino porque el dato diario no existe en Mexico. La duda queda resuelta por el
+lado de la fuente, y la prueba de pago sigue haciendo falta para lo demas: que
+le dan al comprador por doscientos pesos al mes. Detalle en
+`investigacion/fuentes_2026-11.md`.
+
 ## Abasteros
 
 - Fecha de la prueba: PENDIENTE
