@@ -1,0 +1,26 @@
+{
+  "plazas": {
+    "SNIIM_FYH:170": {
+      "filas_ultimo_intento": 57,
+      "fuente": "SNIIM_FYH",
+      "intentos": 390,
+      "intentos_sin_filas": 0,
+      "nombre": "Morelos: Central de Abasto de Cuautla",
+      "plaza_id": "170",
+      "primer_intento": "2026-11-21T01:00:00+00:00",
+      "ultimo_intento": "2027-12-15T13:05:00+00:00",
+      "ultimo_intento_con_filas": "2027-12-15T13:05:00+00:00"
+    },
+    "SNIIM_FYH:999": {
+      "filas_ultimo_intento": 0,
+      "fuente": "SNIIM_FYH",
+      "intentos": 390,
+      "intentos_sin_filas": 390,
+      "nombre": "Plaza de control que sigue muerta",
+      "plaza_id": "999",
+      "primer_intento": "2026-11-21T01:00:00+00:00",
+      "ultimo_intento": "2027-12-15T13:05:00+00:00",
+      "ultimo_intento_con_filas": null
+    }
+  }
+}

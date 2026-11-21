@@ -26,6 +26,7 @@ RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(RAIZ, "ingesta"))
 
 from check_cadencia import evaluar as evaluar_cadencia  # noqa: E402
+from check_reaparicion import evaluar as evaluar_reaparicion  # noqa: E402
 from check_fuentes_stale import evaluar  # noqa: E402
 from frescura_real import VEREDICTOS, frase, medir  # noqa: E402
 from comun import conectar, frase_cadencia  # noqa: E402
@@ -296,6 +297,18 @@ def construir(ruta_base=None, ruta_reporte=None, salida=SALIDA):
         "Se marca asi cuando la mitad o mas de sus productos no cambio ni una vez en la ventana, "
         "o cuando menos del cinco por ciento se movio en el ultimo corte.</p>"
     )
+    import sondas
+
+    _reaparecidas, vigiladas, _sin_intentos = evaluar_reaparicion(sondas.leer())
+    if vigiladas:
+        nombres_vigilados = ", ".join(sorted(registro["nombre"] for registro in vigiladas))
+        partes.append(
+            f"<p>Hay plazas que hoy no publican nada y se consultan igual todos los dias, "
+            f"para enterarse el dia en que vuelvan: {escapar(nombres_vigilados)}. No apareceran "
+            "arriba mientras sigan en cero, y no se rellena su hueco con el ultimo dato que "
+            "dieron. La Central de Abasto de Cuautla publicaba de lunes a viernes sin faltar y "
+            "dejo de publicar el 31 de octubre de 2025.</p>"
+        )
     partes.append(
         "<p>Cada plaza publica a su propio ritmo y ese ritmo esta declarado, no adivinado. "
         "Las centrales de abasto grandes publican cada dia habil y la plaza de Morelos publica "

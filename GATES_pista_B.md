@@ -1,6 +1,6 @@
 # Gates: pista B · espina dorsal de ingesta y frescura
 
-OWNS: ingesta/**, esquema/**, web/**, licencias/**, datos/pista_b/**, fixtures/pista_b/**, .github/workflows/**, tools/verificar_esquema.py, tools/verificar_idempotencia.py, tools/verificar_procedencia.py, tools/verificar_ventana.py, tools/verificar_frescura.py, tools/verificar_pagina.py, tools/verificar_sin_velas.py, tools/verificar_licencias.py, tools/verificar_workflows.py, tools/verificar_sin_guion_largo.py, tools/verificar_historico.py, tools/verificar_grafica_historica.py, tools/verificar_cadencia.py, tools/verificar_plaza_morelos.py, tools/verificar_frescura_cadencia.py, diseno/**
+OWNS: ingesta/**, esquema/**, web/**, licencias/**, datos/pista_b/**, fixtures/pista_b/**, .github/workflows/**, tools/verificar_esquema.py, tools/verificar_idempotencia.py, tools/verificar_procedencia.py, tools/verificar_ventana.py, tools/verificar_frescura.py, tools/verificar_pagina.py, tools/verificar_sin_velas.py, tools/verificar_licencias.py, tools/verificar_workflows.py, tools/verificar_sin_guion_largo.py, tools/verificar_historico.py, tools/verificar_grafica_historica.py, tools/verificar_cadencia.py, tools/verificar_plaza_morelos.py, tools/verificar_frescura_cadencia.py, tools/verificar_reaparicion.py, diseno/**
 
 Scope: ingesta diaria incremental del SNIIM y de la Central de Abasto hacia un esquema normalizado con procedencia completa por fila, el vigilante de fuentes congeladas apuntado a las fuentes nuevas desde el día uno, y una sola página que muestra los precios de hoy con su frescura y su atribución, sin gráficas de velas.
 
@@ -96,6 +96,11 @@ Cadena declarada: Python 3 en el shell del proyecto. Cada verificador es un scri
   EXPECT: frescura por cadencia verificada · control de plaza semanal como diaria rechazado
   EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=control: plaza semanal al dia sin aviso de falta, plaza diaria callada cinco dias reportada | frescura por cadencia verificada · control de plaza semanal como diaria rechazado
 
+- [x] B20: una plaza muerta queda en vigilancia de reaparicion: la ingesta la consulta todos los dias igual que a una viva, cada intento queda registrado aunque devuelva cero filas, y el vigilante interrumpe el dia en que la plaza vuelva a traer filas; probado con un control positivo que simula la reaparicion y con un control negativo que exige silencio mientras la plaza siga muerta
+  CHECK: python tools/verificar_reaparicion.py --control-reaparicion
+  EXPECT: vigilancia de reaparicion verificada · reaparicion detectada y silencio continuo tolerado
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=control por codigo de salida: rojo con el fixture de reaparicion, verde con el registro real | vigilancia de reaparicion verificada · reaparicion detectada y silencio continuo tolerado
+
 - [ ] B12: la consulta escrita al SNIIM está enviada a info.sniim@economia.gob.mx con fecha y copia del texto en el expediente, y la petición de permiso a la Central de Abasto está enviada o registrada como pendiente con fecha
   EVIDENCE: NO CUMPLIDO · textos redactados el 20 de noviembre de 2026 en correspondencia/consulta_sniim.md y correspondencia/permiso_ficeda.md, los dos sin enviar. El envío es del fundador: esta sesión no manda correo en su nombre. Para la FICEDA falta además el destinatario, que no está publicado en el visor y se pide por el canal de atención de ficeda.com.mx. Mientras el gate siga abierto, las dos fuentes quedan en amarillo y el dato se usa como referencia citada con atribución, no como acervo redistribuido.
 
@@ -143,6 +148,24 @@ B19 existe porque la medida de edad del valor cuenta dias de calendario. Para
 una plaza semanal, un precio que cambia en cada publicacion tiene siete dias de
 edad, y decirle al usuario que la mitad de los precios lleva siete dias sin
 moverse describiria como estancada a una plaza que esta al dia.
+
+B20 sale de medir bien lo que B17 solo habia supuesto. La Central de Abasto de
+Cuautla no era una plaza intermitente: publicaba de lunes a viernes sin faltar,
+98 dias en cinco meses, y murio de golpe el 31 de octubre de 2025. Lleva trece
+meses en cero. Una plaza asi no se puede meter al piloto normal, porque no
+tiene ni una fila y todo lo que mide por plaza recorre las filas de la base: en
+el sistema normal es invisible.
+
+Por eso la vigilancia de reaparicion registra el INTENTO y no la fila. Es la
+misma leccion del vigilante de fuentes congeladas, que mide dias desde el
+ultimo fetch bueno y no la antiguedad del archivo: lo que hay que guardar es la
+prueba de que se pregunto, no solo la respuesta.
+
+Este gate interrumpe con una BUENA noticia, que es raro y es a proposito. Rojo
+en CI es lo unico que GitHub notifica, y el flujo del vigilante no despliega,
+asi que ponerlo en rojo no deja el tablero sin actualizar. El mensaje lo dice
+con todas sus letras: no es una falla, es una reaparicion, y lo que toca es
+promover la plaza al piloto.
 
 B12 no lo cierra un agente: es correspondencia del fundador. Mientras esté
 abierto, la ingesta corre solo con fuentes verdes.

@@ -64,6 +64,22 @@ jobs:
         if: always()
         run: python ingesta/check_cadencia.py
 
+      - name: Control positivo del vigilante de reaparicion
+        # Se prueba contra un registro de control en el que una plaza SI volvio,
+        # y se exige que el vigilante salga en rojo. Sin esto, el verde del paso
+        # siguiente no distingue entre una plaza que sigue muerta y un vigilante
+        # que ya no sabe mirar.
+        if: always()
+        run: python tools/verificar_reaparicion.py --control-reaparicion
+
+      - name: Plazas muertas que podrian haber vuelto
+        # Sale en ROJO el dia en que una plaza muerta vuelve a traer filas. Es
+        # una buena noticia que interrumpe a proposito: rojo es lo unico que
+        # GitHub notifica, y este flujo no despliega, asi que fallar aqui no
+        # deja el tablero sin actualizar.
+        if: always()
+        run: python ingesta/check_reaparicion.py
+
       - name: Plazas que dejaron de moverse
         # Avisa del cambio de estado, no del estado: una plaza quieta conocida
         # se reporta como nota y solo la transicion pone la corrida en rojo.

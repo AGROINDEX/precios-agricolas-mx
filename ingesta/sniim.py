@@ -27,6 +27,7 @@ import sys
 from datetime import date, datetime
 
 import comun_bootstrap  # noqa: F401  (pone el paquete en el path)
+from sondas import anotar as anotar_sonda
 from comun import (
     FUENTES,
     anotar_fetch,
@@ -47,6 +48,7 @@ PLAZAS = {
     "160": "Michoacan: Mercado de Abasto de Morelia",
     "140": "Jalisco: Mercado de Abasto de Guadalajara",
     "172": "Morelos: Mercado Adolfo Lopez Mateos de Cuernavaca",
+    "170": "Morelos: Central de Abasto de Cuautla",
 }
 
 # La 172 entra al piloto aunque publique UNA vez por semana, y se consulta
@@ -54,7 +56,16 @@ PLAZAS = {
 # seis peticiones de siete y costaria lo unico que importa: enterarse el dia en
 # que cambie de cadencia. Lo que cambia no es la consulta, es como se juzga el
 # silencio, y eso vive en la tabla CADENCIAS de comun.py.
-PILOTO = ["100", "160", "172"]
+PILOTO = ["100", "160", "172", "170"]
+
+# Plazas que hoy no publican nada y se consultan solo para enterarse el dia en
+# que vuelvan. No tienen ni una fila en la base, asi que todo lo que mide por
+# plaza no las ve: lo que se guarda de ellas es el INTENTO, en sondas.py.
+#
+# La 170, Cuautla, publicaba de lunes a viernes sin faltar y murio el 31 de
+# octubre de 2025. Trece meses en cero. Preguntarle cuesta una peticion al dia
+# y es la unica forma de que su regreso no pase inadvertido otro ano.
+VIGILANCIA = ["170"]
 
 ENCABEZADO = ("producto", "calidad", "presentacion", "origen")
 
@@ -143,7 +154,7 @@ def extraer(pagina, dia, plaza_nombre, url, capturado_en):
     return filas_salida
 
 
-def correr(dia, plazas, ruta_base=None, ruta_reporte=None):
+def correr(dia, plazas, ruta_base=None, ruta_reporte=None, ruta_sondas=None):
     from comun import ahora
 
     conexion = conectar(ruta_base)
@@ -162,6 +173,12 @@ def correr(dia, plazas, ruta_base=None, ruta_reporte=None):
             detalles.append(error)
             continue
         filas = extraer(pagina, dia, nombre, url, capturado_en)
+        if plaza_id in VIGILANCIA:
+            # Se anota el intento ANTES de guardar: lo que esta sonda vigila es
+            # si la plaza respondio con filas, no si esas filas eran nuevas.
+            _registro, reaparecio = anotar_sonda(CLAVE, plaza_id, nombre, len(filas), ruta_sondas)
+            if reaparecio:
+                detalles.append(f"{plaza_id}: REAPARECIO con {len(filas)} filas")
         nuevas, repetidas = guardar(conexion, filas)
         total_nuevas += nuevas
         total_filas += len(filas)
@@ -171,6 +188,9 @@ def correr(dia, plazas, ruta_base=None, ruta_reporte=None):
 
     # Un fetch bueno exige filas. Un 200 con la tabla vacia no cuenta, que es
     # justo el modo en que una fuente se congela sin avisar.
+    # Las plazas en vigilancia no cuentan para el exito del fetch: estan
+    # muertas a proposito y exigirles filas pondria la ingesta en rojo todos los
+    # dias, que es como se entrena a cualquiera a ignorar una alerta.
     exito = total_filas > 0 and error is None
     anotar_fetch(CLAVE, exito, total_nuevas, " · ".join(detalles), ruta_reporte)
     print(f"SNIIM {dia.isoformat()} · {total_filas} filas leidas · {total_nuevas} nuevas · {podadas} podadas")
@@ -191,6 +211,7 @@ if __name__ == "__main__":
     )
     lector.add_argument("--base")
     lector.add_argument("--reporte")
+    lector.add_argument("--sondas")
     argumentos = lector.parse_args()
     dia_pedido = datetime.strptime(argumentos.fecha, "%Y-%m-%d").date()
 
@@ -211,5 +232,6 @@ if __name__ == "__main__":
             argumentos.plazas.split(","),
             argumentos.base,
             argumentos.reporte,
+            argumentos.sondas,
         )
     sys.exit(codigo)

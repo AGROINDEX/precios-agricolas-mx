@@ -1,5 +1,5 @@
 {
-  "actualizado_en": "2026-11-20T19:45:12+00:00",
+  "actualizado_en": "2026-11-21T01:30:10+00:00",
   "fuentes": {
     "FICEDA_CDMX": {
       "critical": true,
@@ -13,9 +13,9 @@
       "critical": true,
       "filas_ultimo_fetch": 0,
       "nombre": "SNIIM · Secretaria de Economia, frutas y hortalizas",
-      "ultimo_detalle": "100: 80 filas, 0 nuevas, 80 repetidas · 160: 85 filas, 0 nuevas, 85 repetidas",
+      "ultimo_detalle": "170: 0 filas, 0 nuevas, 0 repetidas",
       "ultimo_fetch_bueno": "2026-11-20T19:45:12+00:00",
-      "ultimo_intento": "2026-11-20T19:45:12+00:00"
+      "ultimo_intento": "2026-11-21T01:30:10+00:00"
     }
   }
 }

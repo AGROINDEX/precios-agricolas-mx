@@ -114,3 +114,40 @@ contra 0 por ciento en Morelia.
 3 lunes, incluido el 16 de noviembre. El vigilante nuevo nace en rojo por eso, y
 esta bien que nazca en rojo: es la pieza funcionando. Si sigue faltando, esta
 plaza va por el mismo camino que Cuautla, y ahora si nos vamos a enterar.
+
+## Cuautla queda en vigilancia de reaparicion, no en el piloto normal
+
+20 de noviembre de 2026.
+
+**Lo que la medicion corrigio.** Se habia dicho que Cuautla publicaba poco y que
+su ultimo dia con dato era el 16 de octubre de 2025. Las dos cosas estaban mal,
+y por el mismo motivo de siempre: se habia sondeado dias sueltos en vez de un
+rango. Con el rango completo, Cuautla era una plaza DIARIA y sana, 98 dias
+publicados en cinco meses, de lunes a viernes sin faltar, 5,702 filas, y murio
+de golpe el 31 de octubre de 2025. De noviembre de 2025 a marzo de 2026: cero.
+
+**Por que no entra al piloto normal.** Porque no tiene ni una fila, y todo lo
+que este producto mide por plaza recorre las filas de `precios`. Una plaza
+muerta es invisible para la frescura, para la cadencia y para la pagina. Meterla
+al piloto normal y ya habria sido ponerle un asiento vacio en la mesa.
+
+**Lo que se guarda es el intento, no la fila.** La vigilancia escribe en
+`_sondas.json` cuantas veces se le pregunto, cuando fue el ultimo intento y
+cuantos intentos seguidos devolvieron cero. Es la misma leccion del vigilante de
+fuentes congeladas, que mide dias desde el ultimo fetch BUENO y no la antiguedad
+del archivo: lo que hay que registrar es la prueba de que se pregunto.
+
+**El vigilante nuevo interrumpe con una buena noticia.** Sale en rojo el dia en
+que Cuautla vuelva a traer filas, y el mensaje aclara con todas sus letras que
+no es una falla sino una reaparicion, y que lo que toca es promoverla al piloto,
+medir su cadencia nueva y rellenar su ventana. Rojo en CI es lo unico que GitHub
+notifica, y el flujo del vigilante no despliega, asi que fallar ahi no deja el
+tablero sin actualizar. Mientras siga muerta se reporta como nota, no como
+fallo, que es la regla de la casa: interrumpe la transicion, no el estado.
+
+**Tres controles, porque dos no bastaban.** El positivo simula la reaparicion y
+exige rojo. El negativo simula el silencio continuo y exige verde, porque sin el
+un vigilante que gritara siempre pasaria el positivo. Y el tercero cubre el caso
+que los separa: una plaza cuyo PRIMER intento ya trae filas no es una
+reaparicion, porque nunca se la conocio muerta. Sin ese control, el aviso
+saldria cada vez que se agrega cualquier plaza nueva.

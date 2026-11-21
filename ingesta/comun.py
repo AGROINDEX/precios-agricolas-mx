@@ -75,6 +75,15 @@ CADENCIAS = {
         # se le da a una plaza diaria. Menos que eso grita cada semana.
         "umbral_dias": 10,
     },
+    # Medida, no supuesta: publico de lunes a viernes sin faltar, 98 dias en
+    # cinco meses, y murio de golpe el 31 de octubre de 2025. Se declara con la
+    # cadencia que TENIA, porque es contra esa que habria que juzgarla el dia en
+    # que reaparezca.
+    "Morelos: Central de Abasto de Cuautla": {
+        "cadencia": "diaria",
+        "dias": None,
+        "umbral_dias": 3,
+    },
     "DF: Central de Abasto de Iztapalapa (FICEDA)": {
         "cadencia": "diaria",
         "dias": None,

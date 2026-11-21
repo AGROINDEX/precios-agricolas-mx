@@ -1,0 +1,15 @@
+{
+  "plazas": {
+    "SNIIM_FYH:170": {
+      "filas_ultimo_intento": 0,
+      "fuente": "SNIIM_FYH",
+      "intentos": 1,
+      "intentos_sin_filas": 1,
+      "nombre": "Morelos: Central de Abasto de Cuautla",
+      "plaza_id": "170",
+      "primer_intento": "2026-11-21T01:30:10+00:00",
+      "ultimo_intento": "2026-11-21T01:30:10+00:00",
+      "ultimo_intento_con_filas": null
+    }
+  }
+}
