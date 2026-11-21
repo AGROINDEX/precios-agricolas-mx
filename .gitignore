@@ -8,9 +8,9 @@ datos/pista_a/bitacora.json
 # El formato de esos archivos si se versiona: esta en datos/pista_a/README.md.
 
 # La pagina es artefacto generado, no fuente. Se construye al publicar desde
-# datos/pista_b/precios.db, que si se versiona. Versionarla tambien invita al
-# conflicto entre lo que escribe el CI y lo que escribe quien trabaja local, y
-# deja la pagina en vivo una corrida atras.
+# datos/pista_b/precios.db, que se reconstruye desde la fuente. Versionarla
+# invita al conflicto entre lo que escribe el CI y lo que escribe quien trabaja
+# local, y deja la pagina en vivo una corrida atras.
 web/index.html
 
 # Python
@@ -25,3 +25,20 @@ venv/
 
 # Maquetas de diseno: artefacto generado desde la base, como web/index.html.
 diseno/propuesta_*.html
+
+# La base de precios NO se versiona.
+#
+# Con 42 plazas pesa del orden de 130 MB y el flujo diario la comiteaba entera:
+# el repositorio crecería eso cada dia. La salida no es comprimir ni podar mas,
+# es que la base deje de ser memoria. Cada corrida reconstruye la ventana con
+# UNA peticion de rango por plaza, asi que la base es cache reconstruible.
+#
+# Lo que si se versiona es la memoria que no se puede reconstruir:
+# _fetch_report.json, que sabe cuando fue la ultima descarga buena, y
+# _sondas.json, que sabe cuantas veces se le pregunto a una plaza muerta.
+datos/pista_b/precios.db
+datos/pista_b/precios.db-journal
+datos/pista_b/precios.db-wal
+
+# Las paginas son artefacto generado, igual que web/index.html.
+web/plaza/

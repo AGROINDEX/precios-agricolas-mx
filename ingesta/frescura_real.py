@@ -108,6 +108,18 @@ def medir_plaza(productos, mercado=None):
             if abs(valores[ultimo] - valores[anterior]) > 0.005:
                 movieron += 1
 
+        # Los planos se cuentan sobre TODOS los productos con historia
+        # suficiente, esten o no en el ultimo corte. Antes este bloque vivia
+        # despues del `continue` de abajo, asi que un producto que no aparecia
+        # en el ultimo corte no contaba como plano aunque llevara la ventana
+        # entera sin moverse. Con dos plazas la diferencia era invisible; con
+        # 42 el recalculo del gate la destapo.
+        dias_producto = len({fecha for fecha, _valor in puntos})
+        if dias_producto >= MINIMO_DIAS:
+            con_historia += 1
+            if len({round(valor, 2) for _fecha, valor in puntos}) == 1:
+                planos += 1
+
         # Edad del valor: dias desde el ultimo cambio real, contra el ultimo
         # corte de la plaza. Si nunca cambio, la edad es toda su historia.
         ordenados = sorted(puntos)
@@ -127,12 +139,6 @@ def medir_plaza(productos, mercado=None):
         # cadencia: cero publicaciones significa que cambio en el ultimo corte,
         # publique la plaza cada dia o cada lunes.
         edades_pub.append(posicion[ultimo] - posicion[ultimo_cambio])
-
-        dias_producto = len({fecha for fecha, _valor in puntos})
-        if dias_producto >= MINIMO_DIAS:
-            con_historia += 1
-            if len({round(valor, 2) for _fecha, valor in puntos}) == 1:
-                planos += 1
 
     prop_movio = movieron / comparables if comparables else None
     prop_planos = planos / con_historia if con_historia else None

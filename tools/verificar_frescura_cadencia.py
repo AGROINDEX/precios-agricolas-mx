@@ -37,7 +37,7 @@ sys.path.insert(0, ruta("web"))
 
 MARCADOR = "frescura por cadencia verificada · control de plaza semanal como diaria rechazado"
 
-SEMANAL = "Morelos: Mercado Adolfo Lopez Mateos de Cuernavaca"
+SEMANAL = 'Morelos: Mercado "Adolfo López Mateos" de Cuernavaca'
 DIARIA = "DF: Central de Abasto de Iztapalapa DF"
 
 
@@ -56,12 +56,24 @@ def citas_previas(mercado, cuantas, hoy=None):
 
 
 def dice_la_cadencia(pagina, plazas_cadencias):
-    """Toda plaza de la pagina trae su frase de cadencia. Funcion pura."""
+    """Toda plaza de la pagina trae su frase de cadencia. Funcion pura.
+
+    DOS TRAMPAS QUE ESTA FUNCION YA TUVO. La primera: el nombre de varias
+    plazas lleva comillas, y en la pagina va escapado como &quot;, asi que
+    buscarlo crudo no lo encuentra nunca. La segunda, peor: si no se encuentra
+    el nombre, saltar esa plaza en silencio convierte la comprobacion en
+    decorativa justo para las plazas de nombre dificil, que resultaron ser las
+    que importaban. Ahora no encontrar una plaza es una falla, no un salto.
+    """
+    import html as modulo_html
+
     faltantes = []
     for mercado, frase_esperada in plazas_cadencias.items():
-        if mercado not in pagina:
+        aguja = modulo_html.escape(mercado)
+        if aguja not in pagina:
+            faltantes.append(f"{mercado} (no aparece en la vista)")
             continue
-        bloque = pagina.split(mercado, 1)[1][:1200]
+        bloque = pagina.split(aguja, 1)[1][:1200]
         if frase_esperada not in bloque:
             faltantes.append(mercado)
     return faltantes
@@ -126,8 +138,10 @@ def verificar(con_control):
     detalles.append(f"{len(diarias)} plazas diarias siguen contando la antiguedad en dias")
 
     # 3. La pagina dice la cadencia de cada plaza.
-    with open(gate_util.pagina_generada(), encoding="utf-8") as archivo:
-        pagina = archivo.read()
+    pagina = ""
+    for camino in gate_util.paginas_generadas():
+        with open(camino, encoding="utf-8") as archivo:
+            pagina += archivo.read()
     faltantes = dice_la_cadencia(pagina, plazas)
     exigir(
         not faltantes,
@@ -194,7 +208,9 @@ def verificar(con_control):
         construir.construir(base, ruta("datos", "pista_b", "_fetch_report.json"), salida)
         with open(salida, encoding="utf-8") as archivo:
             control = archivo.read()
-        bloque_semanal = control.split(SEMANAL, 1)[1][:1500]
+        import html as modulo_html
+
+        bloque_semanal = control.split(modulo_html.escape(SEMANAL), 1)[1][:1500]
         exigir(
             "falto a su publicacion" not in bloque_semanal,
             "la pagina avisa que la plaza semanal falto a su publicacion cuando esta al dia",

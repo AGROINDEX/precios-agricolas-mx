@@ -29,7 +29,7 @@ from gate_util import exigir
 
 MARCADOR = "plaza de Morelos verificada · dias publicados dentro de la ventana y en su cadencia"
 
-PLAZA = "Morelos: Mercado Adolfo Lopez Mateos de Cuernavaca"
+PLAZA = 'Morelos: Mercado "Adolfo López Mateos" de Cuernavaca'
 CLAVE = "SNIIM_FYH"
 
 # Minimo para que la plaza aporte algo. Once publicaciones semanales son casi

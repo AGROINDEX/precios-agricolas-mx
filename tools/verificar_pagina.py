@@ -36,6 +36,39 @@ def construir(reporte, destino):
     return constructor.construir(None, reporte, destino)
 
 
+def leer_todo(destino):
+    """El indice mas las paginas de plaza que se escribieron junto a el.
+
+    La vista dejo de ser una sola pagina: las filas de datos viven ahora en la
+    pagina de cada plaza. Un verificador que leyera solo el indice pasaria en
+    verde sin haber visto una sola fila.
+    """
+    import glob
+
+    textos = []
+    for camino in [destino] + sorted(
+        glob.glob(os.path.join(os.path.dirname(destino), "plaza", "*.html"))
+    ):
+        with open(camino, encoding="utf-8") as archivo:
+            textos.append(archivo.read())
+    return chr(10).join(textos)
+
+
+def leer_plazas(destino):
+    """Solo las paginas de plaza, que son las que llevan filas de precio.
+
+    El indice tambien tiene una tabla, pero sus filas son plazas y no precios:
+    exigirle a cada una la fecha del dato seria comprobar otra cosa.
+    """
+    import glob
+
+    textos = []
+    for camino in sorted(glob.glob(os.path.join(os.path.dirname(destino), "plaza", "*.html"))):
+        with open(camino, encoding="utf-8") as archivo:
+            textos.append(archivo.read())
+    return chr(10).join(textos)
+
+
 def filas_de(pagina):
     return re.findall(r"<tr[^>]*>(.*?)</tr>", pagina, re.S | re.I)
 
@@ -46,8 +79,7 @@ def verificar(simulado):
 
     destino_real = os.path.join(carpeta, "real.html")
     construir(REPORTE_REAL, destino_real)
-    with open(destino_real, encoding="utf-8") as archivo:
-        real = archivo.read()
+    real = leer_todo(destino_real)
 
     exigir("Fuente congelada" not in real, "la pagina avisa congelamiento con el reporte real sano")
     exigir(
@@ -73,7 +105,9 @@ def verificar(simulado):
     # Frescura por fila: cada fila de datos termina con una fecha ISO visible.
     con_fecha = 0
     sin_fecha = 0
-    for fila in filas_de(real):
+    paginas_de_plaza = leer_plazas(destino_real)
+    exigir(paginas_de_plaza, "no se escribio ninguna pagina de plaza")
+    for fila in filas_de(paginas_de_plaza):
         celdas = re.findall(r"<td[^>]*>(.*?)</td>", fila, re.S | re.I)
         if not celdas:
             continue
@@ -88,8 +122,7 @@ def verificar(simulado):
     if simulado:
         destino_congelado = os.path.join(carpeta, "congelado.html")
         _ruta, _bloques, congeladas = construir(CONTROL, destino_congelado)
-        with open(destino_congelado, encoding="utf-8") as archivo:
-            congelado = archivo.read()
+        congelado = leer_todo(destino_congelado)
         exigir(congeladas, "el constructor no reconocio ninguna fuente congelada del control")
         exigir("Fuente congelada" not in real, "contaminacion entre las dos construcciones")
         exigir(

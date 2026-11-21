@@ -57,38 +57,34 @@ FUENTES = {
 # `dias` usa la numeracion de datetime.weekday(): lunes 0, domingo 6. En una
 # plaza diaria es None y se asume la semana habil, porque el SNIIM no publica
 # sabados ni domingos.
-CADENCIAS = {
-    "DF: Central de Abasto de Iztapalapa DF": {
-        "cadencia": "diaria",
-        "dias": None,
-        "umbral_dias": 3,
-    },
-    "Michoacan: Mercado de Abasto de Morelia": {
-        "cadencia": "diaria",
-        "dias": None,
-        "umbral_dias": 3,
-    },
-    "Morelos: Mercado Adolfo Lopez Mateos de Cuernavaca": {
-        "cadencia": "semanal",
-        "dias": [0],
-        # Diez dias son el lunes esperado mas la misma holgura de tres dias que
-        # se le da a una plaza diaria. Menos que eso grita cada semana.
-        "umbral_dias": 10,
-    },
-    # Medida, no supuesta: publico de lunes a viernes sin faltar, 98 dias en
-    # cinco meses, y murio de golpe el 31 de octubre de 2025. Se declara con la
-    # cadencia que TENIA, porque es contra esa que habria que juzgarla el dia en
-    # que reaparezca.
-    "Morelos: Central de Abasto de Cuautla": {
-        "cadencia": "diaria",
-        "dias": None,
-        "umbral_dias": 3,
-    },
-    "DF: Central de Abasto de Iztapalapa (FICEDA)": {
-        "cadencia": "diaria",
-        "dias": None,
-        "umbral_dias": 3,
-    },
+# La tabla de plazas del SNIIM viene MEDIDA y generada, no escrita a mano: son
+# 41 plazas vivas y una cadencia mal declarada es peor que ninguna, porque el
+# vigilante juzgaria el silencio contra una cita equivocada. Se genera con
+# `python ingesta/medir_cadencia.py --escribir`.
+from cadencias import CADENCIAS_MEDIDAS  # noqa: E402
+
+CADENCIAS = dict(CADENCIAS_MEDIDAS)
+
+# Cadencia HISTORICA de las plazas que ya no publican. El censo no las puede
+# medir, porque mide la ventana declarada y ahi no traen nada. Se declara la
+# cadencia que TENIAN, medida una vez contra el historico de la fuente, porque
+# es contra esa que habria que juzgarlas el dia en que vuelvan.
+#
+# Cuautla: medida el 20 de noviembre de 2026 sobre el rango 2025-06-01 a
+# 2025-10-31. Publico 98 dias de lunes a viernes sin faltar, 5,702 filas, y su
+# ultimo dia fue el 31 de octubre de 2025.
+CADENCIAS["Morelos: Central de Abasto de Cuautla"] = {
+    "cadencia": "diaria",
+    "dias": None,
+    "umbral_dias": 3,
+}
+
+# La Central de Abasto no es una plaza del SNIIM y no sale del censo, asi que su
+# cadencia se declara aqui. Publica con un dia de rezago, todos los dias.
+CADENCIAS["DF: Central de Abasto de Iztapalapa (FICEDA)"] = {
+    "cadencia": "diaria",
+    "dias": None,
+    "umbral_dias": 3,
 }
 
 # Una plaza sin cadencia declarada se trata como diaria y se DICE que no esta
@@ -115,7 +111,10 @@ def frase_cadencia(mercado):
         nombres = ["los lunes", "los martes", "los miercoles", "los jueves",
                    "los viernes", "los sabados", "los domingos"]
         dias = " y ".join(nombres[d] for d in regla["dias"])
-        return f"esta plaza publica una vez por semana, {dias}"
+        veces = {1: "una vez", 2: "dos veces", 3: "tres veces"}.get(
+            len(regla["dias"]), f"{len(regla['dias'])} veces"
+        )
+        return f"esta plaza publica {veces} por semana, {dias}"
     if regla["cadencia"] == "diaria":
         return "esta plaza publica cada dia habil"
     return "cadencia de esta plaza todavia sin declarar"

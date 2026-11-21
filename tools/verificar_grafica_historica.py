@@ -50,13 +50,17 @@ def asegurar(nombre, camino):
     if os.path.exists(camino):
         return camino
     if nombre == "publicada":
-        return gate_util.pagina_generada()
+        gate_util.pagina_generada()
+        return camino
     sys.path.insert(0, ruta("diseno"))
     modulo = __import__(MODULOS[nombre])
     return modulo.construir()
 
+# La vista publicada son el indice y una pagina por plaza. El indice no dibuja
+# series a proposito: las graficas viven en la pagina de cada plaza, y exigirle
+# al indice que dibuje seria pedirle volver a pesar varios megabytes.
 PAGINAS = {
-    "publicada": ruta("web", "index.html"),
+    "publicada": ruta("web", "plaza"),
     "A terminal": PAGINA_A,
     "B mercado": ruta("diseno", "propuesta_b_mercado.html"),
     "C la brecha": ruta("diseno", "propuesta_c_brecha.html"),
@@ -148,8 +152,18 @@ def verificar(control):
     for nombre, camino in PAGINAS.items():
         camino = asegurar(nombre, camino)
         exigir(os.path.exists(camino), f"falta la pagina {nombre}: {camino}")
-        with open(camino, encoding="utf-8") as archivo:
-            contenido = archivo.read()
+        if os.path.isdir(camino):
+            import glob
+
+            archivos = sorted(glob.glob(os.path.join(camino, "*.html")))
+            exigir(archivos, f"la carpeta {camino} no tiene ninguna pagina de plaza")
+            contenido = ""
+            for uno in archivos:
+                with open(uno, encoding="utf-8") as archivo:
+                    contenido += archivo.read()
+        else:
+            with open(camino, encoding="utf-8") as archivo:
+                contenido = archivo.read()
         dibujadas = len(PUNTOS.findall(contenido))
         exigir(dibujadas > 0, f"la pagina {nombre} no dibuja ninguna serie historica")
         # Se prohibe la mediana movil POR PRODUCTO, que es la que el historico

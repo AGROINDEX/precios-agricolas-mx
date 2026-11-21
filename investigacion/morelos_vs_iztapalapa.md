@@ -55,10 +55,22 @@ positiva cuando Morelos esta mas caro.
 | 2026-10-26 | lunes | 57 | 41 | 2 | +34.1% | -42.9% | +199.9% |
 | 2026-11-09 | lunes | 56 | 40 | 2 | +21.4% | -50.0% | +157.1% |
 
-El 2 de noviembre falta: ese lunes la fuente no publico. Tampoco publico el 16
-de noviembre, que es el lunes siguiente al ultimo renglon de la tabla. Dicho
-completo: la plaza cumplio 11 de sus 13 citas, y falto a 2 de las ultimas 3. Si
-sigue asi va por el mismo camino que Cuautla.
+El 2 de noviembre falta, y el 16 tampoco aparece.
+
+**Correccion del 21 de noviembre de 2026, y es importante porque aqui se dijo
+lo contrario.** Se escribio que la plaza falto a 2 de sus ultimas 3 citas y que
+iba por el camino de Cuautla. Es falso. Al integrar las 41 plazas quedo a la
+vista que **Iztapalapa tampoco publico el 2 ni el 16 de noviembre**, ni el 16 de
+septiembre: son los tres unicos dias habiles que falta en toda la ventana, y son
+los tres festivos nacionales. Esos dos lunes no fueron faltas de Cuernavaca,
+fueron dias en que el SNIIM entero no publico. **La plaza cumplio sus 11 citas
+reales de 11.**
+
+De ahi salio una pieza que no existia: los festivos no se adivinan con un
+calendario que habria que mantener a mano, se leen de la fuente. Un dia en que
+NINGUNA plaza publico es un dia en que la fuente no publico, y entonces no es
+cita de nadie. Con 41 plazas en la base esa señal es inequivoca; con dos no se
+podia afirmar.
 
 Mediana de las 11 medianas semanales: **+28.6%**. Semanas con Morelos mas caro:
 **11 de 11**.

@@ -23,7 +23,7 @@ import sys
 import tempfile
 
 import gate_util
-from gate_util import exigir, pagina_generada
+from gate_util import exigir
 
 MARCADOR = "frescura real verificada · recalculo coincide y plaza estancada detectada"
 
@@ -181,9 +181,13 @@ def verificar(con_control):
             " con 100 por ciento de planos"
         )
 
-    # La medida tiene que estar a la vista, no solo calculada.
-    with open(pagina_generada(), encoding="utf-8") as archivo:
-        pagina = archivo.read()
+    # La medida tiene que estar a la vista, no solo calculada. La vista son
+    # ahora el indice y una pagina por plaza, asi que se leen todas: mirar solo
+    # el indice dejaria de comprobar lo que dice cada plaza de si misma.
+    pagina = ""
+    for camino in gate_util.paginas_generadas():
+        with open(camino, encoding="utf-8") as archivo:
+            pagina += archivo.read()
     exigir('class="pulso' in pagina, "la pagina no publica el veredicto de movimiento por plaza")
     exigir(
         "no la fecha que la fuente declara" in pagina,

@@ -67,16 +67,27 @@ se puede recalcular.
 python ingesta/check_plazas_quietas.py
 ```
 
-**Cadencia declarada por plaza.** Tres plazas del piloto publican cada dia
-habil y la de Morelos publica una vez por semana, los lunes. El silencio de una
+**Cadencia MEDIDA por plaza, no escrita a mano.** Son 42 plazas: 38 publican
+cada dia habil, Cuernavaca publica los lunes y Colima y Oaxaca publican martes
+y viernes. El silencio de una
 plaza solo se puede juzgar contra su propia cadencia: con el umbral diario, la
 plaza semanal se declararia muerta cada martes, y con el umbral semanal una
-plaza diaria podria estar tres dias caida sin que nadie avisara. La cadencia
-vive declarada en `comun.CADENCIAS`, a la vista, y hay un vigilante POR PLAZA,
+plaza diaria podria estar tres dias caida sin que nadie avisara. Con 41 plazas, teclear eso a mano es una invitacion al error, y una cadencia
+mal declarada es peor que ninguna, asi que se mide: `ingesta/medir_cadencia.py`
+consulta el catalogo real, mide las 49 plazas del desplegable y genera
+`ingesta/cadencias.py`. Una plaza cuya cadencia no se entiende queda SIN
+declarar, con su motivo escrito, en vez de recibir una inventada. Y hay un
+vigilante POR PLAZA,
 porque el de fuentes congeladas mide la fuente entera: mientras Iztapalapa
 publique, el SNIIM se ve sano aunque una plaza lleve un ano muerta. Asi se
-murio la Central de Abasto de Cuautla, el 16 de octubre de 2025, sin que nadie
+murio la Central de Abasto de Cuautla, el 31 de octubre de 2025, sin que nadie
 lo notara.
+
+**Los festivos se leen de la fuente, no de un calendario.** Un dia en que
+NINGUNA plaza publico es un dia en que la fuente no publico, y entonces no es
+cita de nadie. Sin esto, el vigilante daba por faltante a la plaza que publica
+los lunes cuando ese lunes era festivo nacional. Un calendario habria que
+mantenerlo a mano y se desactualiza; el silencio de 42 plazas a la vez no.
 
 ```powershell
 python ingesta/check_cadencia.py
@@ -86,6 +97,24 @@ A la plaza semanal se le pregunta igual todos los dias, aunque seis de cada
 siete devuelvan vacio. Dejar de preguntar ahorraria peticiones y costaria lo
 unico que importa: enterarse el dia en que cambie de cadencia. Lo que cambia no
 es la consulta, es como se juzga el silencio.
+
+**La ingesta pide rangos, no dias.** Llenar la ventana con una peticion por dia
+serian 3,780 peticiones; por rango son 42, una por plaza. Y leer por rango
+obliga a leer la fecha de cada fila en vez de asumir la del dia pedido, asi que
+una publicacion tardia llega con su fecha correcta.
+
+**La base no se versiona.** Con 42 plazas pesa 130 MB y comitearla cada dia
+haria crecer el repositorio eso diario. Como cada corrida reconstruye la ventana
+desde la fuente, la base es cache reconstruible y vive en la cache del corredor
+de CI. Lo que si se versiona es la memoria que no se puede reconstruir, el
+reporte de fetch y el registro de sondas, que pesan kilobytes. Si la cache
+falta, el flujo de publicacion falla y no publica, asi que la ultima pagina
+buena sigue en vivo.
+
+**Una pagina por plaza, y un indice.** 42 plazas por sesenta cotizaciones por
+una grafica cada una serian miles de SVG en una sola pagina. El indice lleva una
+fila por plaza, pesa 19 KiB y dice de un golpe quien publico hoy; el detalle con
+graficas vive en la pagina de cada plaza.
 
 **Frescura declarada siempre.** Cada precio lleva su fecha y su fuente. Si una
 fuente se congela, la pagina lo dice en la cara del usuario en vez de mostrar el

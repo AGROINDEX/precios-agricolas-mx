@@ -49,6 +49,41 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Recuperar la base que dejo la ingesta
+        # La base no se versiona, asi que este flujo no la trae del checkout.
+        # Se lee de la cache que escribio la ingesta.
+        uses: actions/cache/restore@v4
+        with:
+          path: datos/pista_b/precios.db
+          key: precios-db-
+          restore-keys: |
+            precios-db-
+
+      - name: Exigir que la base recuperada sirva
+        # Este flujo NO ingiere, a proposito. Si ingiriera, seria a la vez
+        # publicador y medidor del mundo, y la separacion que protege el gate
+        # B10 dejaria de ser legible.
+        #
+        # Si la cache no estaba, se falla aqui. Fallar deja la ULTIMA pagina
+        # buena publicada, que es mejor que publicar una pagina vacia con buen
+        # titulo. La siguiente corrida de la ingesta repuebla la cache.
+        run: |
+          python -c "
+          import os, sqlite3, sys
+          base = 'datos/pista_b/precios.db'
+          filas = 0
+          if os.path.exists(base):
+              try:
+                  filas = sqlite3.connect(base).execute('SELECT COUNT(*) FROM precios').fetchone()[0]
+              except sqlite3.Error:
+                  filas = 0
+          print('filas en la base recuperada:', filas)
+          if filas < 1000:
+              print('::error::la cache de la base no estaba o venia vacia. No se publica: la pagina anterior sigue en vivo y la ingesta repuebla la cache en su proxima corrida.')
+              sys.exit(1)
+          "
+          python ingesta/derivados.py
+
       - name: Construir la pagina desde la base
         run: python web/construir.py
 
@@ -59,6 +94,10 @@ jobs:
           test -f web/index.html
           grep -q "Precios de hoy" web/index.html
           grep -q "no es precio en finca" web/index.html
+          # Con 42 plazas, el indice tiene que traerlas todas y cada una su
+          # pagina. Un indice sin filas es una pagina vacia con buen titulo.
+          test "$(ls web/plaza/*.html | wc -l)" -ge 20
+          grep -c "plaza/" web/index.html
           echo "pagina lista para publicar"
 
       - uses: actions/configure-pages@v5

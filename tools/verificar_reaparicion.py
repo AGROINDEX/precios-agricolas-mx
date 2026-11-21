@@ -48,13 +48,20 @@ def verificar(con_control):
     exigir(identificadores, f"{MUERTA} no esta en sniim.PLAZAS")
     plaza_id = identificadores[0]
     exigir(
-        plaza_id in sniim.PILOTO,
-        f"{MUERTA} no esta en el piloto, asi que la ingesta no le pregunta nunca",
+        plaza_id in sniim.VIGILANCIA,
+        f"{MUERTA} no esta en vigilancia: su intento no se registraria y su regreso"
+        " pasaria inadvertido",
     )
     exigir(
-        plaza_id in sniim.VIGILANCIA,
-        f"{MUERTA} esta en el piloto pero no en vigilancia: su intento no se registraria"
-        " y su regreso pasaria inadvertido",
+        plaza_id not in sniim.PILOTO,
+        f"{MUERTA} esta en el piloto y no publica nada: seria un asiento vacio en la mesa",
+    )
+    # Lo que importa no es en que lista esta, sino que la ingesta le pregunte
+    # en una corrida normal, sin que nadie se acuerde de pedirlo.
+    exigir(
+        plaza_id in sniim.plazas_por_defecto(),
+        f"una corrida normal de la ingesta no le pregunta a {MUERTA}: su regreso"
+        " pasaria inadvertido otro ano",
     )
     exigir(
         MUERTA in CADENCIAS,

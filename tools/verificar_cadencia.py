@@ -108,15 +108,22 @@ def verificar(con_control):
             identificadores[0] in sniim.PILOTO,
             f"{nombre} no esta en el piloto, asi que no se consulta nunca",
         )
-        jueves = LUNES + timedelta(days=3)
-        exigir(
-            not toca_publicar(nombre, jueves),
-            f"{nombre} deberia no tener cita en jueves y la tiene: el control no prueba nada",
-        )
-        exigir(
-            toca_publicar(nombre, LUNES),
-            f"{nombre} declara cadencia semanal y no tiene cita en su propio lunes",
-        )
+        # Cada plaza semanal tiene SUS dias, que no son los mismos: una publica
+        # los lunes y dos publican martes y viernes. Se comprueba contra los
+        # dias que ella declara, no contra un lunes fijo.
+        propios = set(cadencia(nombre)["dias"])
+        ajenos = set(range(7)) - propios
+        for dia_propio in propios:
+            exigir(
+                toca_publicar(nombre, LUNES + timedelta(days=dia_propio)),
+                f"{nombre} declara publicar en {dia_propio} y no tiene cita ese dia",
+            )
+        for dia_ajeno in ajenos:
+            exigir(
+                not toca_publicar(nombre, LUNES + timedelta(days=dia_ajeno)),
+                f"{nombre} no declara el dia {dia_ajeno} y aun asi tiene cita: el control"
+                " no prueba nada",
+            )
     detalles.append(
         f"{len(semanales)} plaza semanal en el piloto, consultada tambien fuera de su dia"
     )

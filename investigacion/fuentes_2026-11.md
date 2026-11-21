@@ -348,9 +348,15 @@ memoria caduca**, y que hay que guardar la cita con su fecha de lectura.
 
 ## 10. El plan, en orden
 
-**1. Barrer las 41 plazas vivas de frutas y hortalizas.** Doce veces mas dato
-por dos minutos de ingesta, declarando la cadencia de Colima y Oaxaca para que
-el vigilante no las entierre. Es lo mas barato y lo mas inmediato.
+**1. Barrer las 41 plazas vivas de frutas y hortalizas. HECHO el 21 de noviembre
+de 2026.** 133,946 filas, 42 plazas con el visor de la Central de Abasto, y la
+cadencia de cada una medida y generada en vez de escrita a mano. Forzo cuatro
+cosas que no estaban en este plan y que resultaron ser las importantes: la
+ingesta por rango, una peticion por plaza en vez de noventa; la base fuera de
+git, porque pesa 130 MB; una pagina por plaza mas un indice, porque 2,500
+graficas en una sola pagina son megabytes; y la regla de festivos leida de la
+fuente, que corrigio un falso positivo del vigilante. Detalle en
+`DECISIONES.md`.
 
 **2. USDA AMS por la ruta de PDF.** Es la mejor fuente nueva, la unica verde sin
 matices, diaria, y abre la mitad exportadora que hoy no vemos. Son ocho PDF al

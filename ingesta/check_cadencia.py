@@ -12,6 +12,16 @@ la declararia muerta cada martes, y una alerta que sale siempre es una alerta
 que nadie mira. La cadencia vive declarada en `comun.CADENCIAS`, a la vista y no
 escondida en una condicion.
 
+LOS FESTIVOS NO SE ADIVINAN, SE LEEN DE LA FUENTE. El 16 de noviembre de 2026
+ninguna plaza del SNIIM publico, porque fue festivo nacional. Juzgado sin eso,
+el Mercado de Cuernavaca, que publica los lunes, aparecia faltando a su cita, y
+el vigilante salia en rojo por una plaza que estaba perfectamente al dia. La
+correccion no necesita un calendario de festivos, que habria que mantener a
+mano y se desactualiza: un dia en que NINGUNA plaza de la fuente publico es un
+dia en que la fuente no publico, y entonces no es cita de nadie. La fuente
+declara sus propios festivos con su silencio, y con 41 plazas en la base esa
+señal es inequivoca.
+
 QUE INTERRUMPE Y QUE NO. Igual que check_plazas_quietas.py, lo que interrumpe es
 la TRANSICION: el dia en que una plaza que cumplio su ultima cita falta a la
 siguiente. El silencio que ya se conocia se reporta como nota. El silencio
@@ -44,12 +54,45 @@ for _flujo in (sys.stdout, sys.stderr):
 VENTANA_CITAS = 90
 
 
-def citas(mercado, hasta, desde):
-    """Dias en que a esta plaza le tocaba publicar, de mas nuevo a mas viejo."""
+def dias_sin_fuente(conexion, fuente, desde, hasta):
+    """Dias en que NINGUNA plaza de la fuente publico: festivos de la fuente.
+
+    Solo se afirma para los dias dentro del tramo que la base cubre. Fuera de
+    ese tramo no se sabe si la fuente callo o si nosotros no estabamos
+    mirando, y afirmarlo seria inventar.
+    """
+    filas = conexion.execute(
+        "SELECT MIN(fecha_dato), MAX(fecha_dato) FROM precios WHERE fuente = ?", (fuente,)
+    ).fetchone()
+    if not filas or not filas[0]:
+        return set()
+    primero = datetime.strptime(filas[0], "%Y-%m-%d").date()
+    ultimo = datetime.strptime(filas[1], "%Y-%m-%d").date()
+    publicados = {
+        fila[0]
+        for fila in conexion.execute(
+            "SELECT DISTINCT fecha_dato FROM precios WHERE fuente = ?", (fuente,)
+        )
+    }
+    callados = set()
+    dia = max(desde, primero)
+    tope = min(hasta, ultimo)
+    while dia <= tope:
+        if dia.isoformat() not in publicados:
+            callados.add(dia)
+        dia += timedelta(days=1)
+    return callados
+
+
+def citas(mercado, hasta, desde, festivos=frozenset()):
+    """Dias en que a esta plaza le tocaba publicar, de mas nuevo a mas viejo.
+
+    Un dia en que la fuente entera callo no es cita de nadie.
+    """
     salida = []
     dia = hasta
     while dia >= desde:
-        if toca_publicar(mercado, dia):
+        if toca_publicar(mercado, dia) and dia not in festivos:
             salida.append(dia)
         dia -= timedelta(days=1)
     return salida
@@ -62,6 +105,13 @@ def evaluar(conexion, hoy=None):
         "SELECT fuente, mercado, MAX(fecha_dato), MIN(fecha_dato) FROM precios"
         " GROUP BY fuente, mercado"
     ).fetchall()
+
+    # Los festivos se leen de la fuente, por fuente: el SNIIM y la Central de
+    # Abasto no cierran los mismos dias.
+    festivos = {
+        fuente: dias_sin_fuente(conexion, fuente, desde, hoy)
+        for fuente in {fila[0] for fila in filas}
+    }
 
     faltaron, calladas, sanas = [], [], []
     for fuente, mercado, ultimo, primero in filas:
@@ -78,7 +128,7 @@ def evaluar(conexion, hoy=None):
         # el cumplimiento de la plaza: la Central de Abasto llevaria un dia
         # ingestado y apareceria como que falto a sesenta y tres citas.
         inicio = max(desde, datetime.strptime(primero, "%Y-%m-%d").date())
-        agenda = citas(mercado, hoy, inicio)
+        agenda = citas(mercado, hoy, inicio, festivos.get(fuente, frozenset()))
         # La cita de hoy no se juzga: la ingesta corre a las 13:00 UTC y la
         # fuente puede publicar mas tarde. La primera cita juzgable es la
         # anterior a hoy.
@@ -96,6 +146,7 @@ def evaluar(conexion, hoy=None):
             "citas": len(juzgables),
             "cumplidas": len(cumplidas),
             "frase": frase_cadencia(mercado),
+            "festivos_fuente": len(festivos.get(fuente, ())),
         }
 
         if not juzgables:

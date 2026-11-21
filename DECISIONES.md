@@ -151,3 +151,115 @@ un vigilante que gritara siempre pasaria el positivo. Y el tercero cubre el caso
 que los separa: una plaza cuyo PRIMER intento ya trae filas no es una
 reaparicion, porque nunca se la conocio muerta. Sin ese control, el aviso
 saldria cada vez que se agrega cualquier plaza nueva.
+
+## Las 41 plazas entran, y fuerzan cuatro cambios de arquitectura
+
+21 de noviembre de 2026.
+
+El piloto pasa de 3 plazas del SNIIM a 41, mas el visor de la Central de Abasto:
+42 plazas, 133,946 filas en la ventana de 90 dias. Antes se usaba el 8 por
+ciento de lo que la fuente publica.
+
+Agregar plazas era de dos lineas. Lo que costo, y lo que valio, es lo que las 41
+dejaron ver.
+
+### La cadencia se genera midiendo, no se escribe a mano
+
+Con tres plazas, teclear la cadencia era razonable. Con 41 es una invitacion al
+error, y una cadencia declarada mal es PEOR que ninguna: el vigilante juzga el
+silencio contra una cita equivocada y da por muerta una plaza viva. Ahora
+`ingesta/medir_cadencia.py` consulta el catalogo real del formulario, mide las
+49 plazas con una peticion de rango cada una, clasifica y escribe
+`ingesta/cadencias.py`, que es archivo generado y lo dice en su cabecera.
+
+El censo: **38 diarias, 3 no diarias, 8 muertas**. Las no diarias son Cuernavaca
+los lunes, y Colima y Oaxaca los martes y viernes. Esas dos ultimas no estaban
+en el radar de nadie: habrian aparecido como muertas cinco dias de cada siete.
+
+Y la clasificacion se niega a adivinar. Una plaza que no encaja en diaria ni en
+semanal con regularidad del 60 por ciento queda **sin declarar**, con su motivo
+escrito, en vez de recibir una cadencia inventada.
+
+### Los festivos se leen de la fuente, no de un calendario
+
+Este es el hallazgo que corrige un error propio. El vigilante decia que el
+Mercado de Cuernavaca habia faltado a 2 de sus ultimas 3 citas, y de ahi se
+escribio que iba por el camino de Cuautla. Era falso.
+
+Con las 41 plazas quedo a la vista que **Iztapalapa tampoco publico el 2 ni el
+16 de noviembre**, ni el 16 de septiembre: son los tres unicos dias habiles que
+falta en 90 dias, y son los tres festivos nacionales. Los dos lunes que
+Cuernavaca "falto" eran dias en que el SNIIM entero estaba cerrado. La plaza
+cumplio 11 de 11.
+
+La correccion no necesita un calendario de festivos, que habria que mantener a
+mano y se desactualiza. Un dia en que NINGUNA plaza de la fuente publico es un
+dia en que la fuente no publico, y entonces no es cita de nadie. **La fuente
+declara sus propios festivos con su silencio.** Con dos plazas esa señal no se
+podia afirmar; con 41 es inequivoca. Es la primera vez que agregar dato mejora
+una medida en vez de solo aumentarla.
+
+### La ingesta pide rangos, no dias
+
+Llenar la ventana con una peticion por dia serian 90 por 42, o sea 3,780
+peticiones. Por rango son 42. El endpoint acepta `fechaInicio` distinto de
+`fechaFinal` desde siempre y no lo estabamos usando.
+
+Y leer por rango obliga a leer la fecha de CADA FILA en vez de asumir la del dia
+pedido, que es mejor por si solo: si la fuente publica tarde, la fila llega con
+su fecha correcta en vez de con la de hoy. Esa suposicion llevaba ahi desde el
+primer dia y nadie la habia tocado.
+
+La corrida normal pide los ultimos 10 dias; si la base viene vacia o atrasada,
+pide la ventana completa sola. Eso lo decide `dias_a_pedir`, mirando la base.
+
+### La base sale de git
+
+Con 42 plazas la base pesa **130 MB**, y el flujo diario la comiteaba entera: el
+repositorio habria crecido eso cada dia. La salida no es comprimir ni podar mas,
+es que la base **deje de ser memoria**. Si cada corrida reconstruye la ventana
+con una peticion de rango por plaza, la base es cache reconstruible y no hay
+nada que versionar. Vive en la cache del corredor de CI, que es exactamente para
+lo que la cache existe.
+
+Lo que si se sigue versionando es la memoria que NO se puede reconstruir, y pesa
+kilobytes: `_fetch_report.json`, que sabe cuando fue la ultima descarga buena, y
+`_sondas.json`, que sabe cuantas veces se le pregunto a una plaza muerta.
+
+La resiliencia no se pierde. Si la cache falta, el flujo de publicacion **falla y
+no publica**, asi que la ultima pagina buena sigue en vivo y la siguiente
+ingesta repuebla la cache. Antes se habria publicado una pagina con dato viejo
+presentado como de hoy, que es peor. Y el flujo de publicacion NO ingiere a
+proposito: si lo hiciera seria a la vez publicador y medidor, y la separacion
+que protege el gate B10 dejaria de ser legible.
+
+Queda pendiente declarado, no olvidado: `consulta_url` es el 66 por ciento del
+texto de la base, con 42 urls distintas para 133,946 filas. Normalizarla
+ahorraria unos 45 MB. Se aplaza porque el motivo que la hacia urgente, comitear
+la base cada dia, ya no existe.
+
+### Una pagina por plaza, y un indice
+
+42 plazas por unas sesenta cotizaciones por una grafica cada una son del orden de
+2,500 SVG en linea: varios megabytes en una sola pagina, que en una conexion de
+campo no se abre. Ahora el indice lleva una fila por plaza con su corte, su
+cadencia y su veredicto de movimiento, y el detalle con graficas vive en la
+pagina de cada plaza.
+
+El indice pesa **19 KiB**, 4 comprimido, y la plaza mas pesada 242 KiB, contra un
+presupuesto declarado de 700. Y el indice resulto ser lo que de verdad hacia
+falta: ver de un golpe quien publico hoy y quien no.
+
+### Dos bugs que la escala destapo
+
+**`prop_planos` mentia.** El calculo de cuantos productos nunca cambiaron de
+precio excluia a los que no aparecian en el ultimo corte, contra su propia
+definicion escrita. Con dos plazas la diferencia era invisible; con 42, el
+recalculo independiente del gate B13 la destapo de inmediato: el modulo decia 2
+por ciento y el recalculo 7.
+
+**Un verificador que saltaba en silencio.** La comprobacion de que la pagina
+declara la cadencia de cada plaza buscaba el nombre crudo, y los nombres con
+comillas van escapados en el HTML. No lo encontraba, y entonces **saltaba esa
+plaza**, justo la que importaba. Un verificador que salta lo que no entiende es
+decorativo. Ahora no encontrar una plaza es una falla.

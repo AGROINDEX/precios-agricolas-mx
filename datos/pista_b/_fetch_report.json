@@ -1,21 +1,21 @@
 {
-  "actualizado_en": "2026-11-21T01:30:10+00:00",
+  "actualizado_en": "2026-11-21T02:23:30+00:00",
   "fuentes": {
     "FICEDA_CDMX": {
       "critical": true,
-      "filas_ultimo_fetch": 0,
+      "filas_ultimo_fetch": 80,
       "nombre": "Central de Abasto de la Ciudad de Mexico · FICEDA",
-      "ultimo_detalle": "80 filas, 0 nuevas, 80 repetidas, corte 2026-11-19",
-      "ultimo_fetch_bueno": "2026-11-20T17:10:05+00:00",
-      "ultimo_intento": "2026-11-20T17:10:05+00:00"
+      "ultimo_detalle": "80 filas, 80 nuevas, 0 repetidas, corte 2026-11-20",
+      "ultimo_fetch_bueno": "2026-11-21T02:23:30+00:00",
+      "ultimo_intento": "2026-11-21T02:23:30+00:00"
     },
     "SNIIM_FYH": {
       "critical": true,
-      "filas_ultimo_fetch": 0,
+      "filas_ultimo_fetch": 133866,
       "nombre": "SNIIM · Secretaria de Economia, frutas y hortalizas",
-      "ultimo_detalle": "170: 0 filas, 0 nuevas, 0 repetidas",
-      "ultimo_fetch_bueno": "2026-11-20T19:45:12+00:00",
-      "ultimo_intento": "2026-11-21T01:30:10+00:00"
+      "ultimo_detalle": "190: 5763 filas, 5763 nuevas, 0 repetidas · 140: 5304 filas, 5304 nuevas, 0 repetidas · 160: 5230 filas, 5230 nuevas, 0 repetidas · 141: 5147 filas, 5147 nuevas, 0 repetidas · 100: 4626 filas, 4626 nuevas, 0 repetidas · 181: 4560 filas, 4560 nuevas, 0 repetidas · 180: 4559 filas, 4559 nuevas, 0 repetidas · 33: 4459 filas, 4459 nuevas, 0 repetidas · 230: 4278 filas, 4278 nuevas, 0 repetidas · 210: 4038 filas, 4038 nuevas, 0 repetidas · 306: 3932 filas, 3932 nuevas, 0 repetidas · 301: 3782 filas, 3782 nuevas, 0 repetidas",
+      "ultimo_fetch_bueno": "2026-11-21T02:23:12+00:00",
+      "ultimo_intento": "2026-11-21T02:23:12+00:00"
     }
   }
 }

@@ -1,6 +1,6 @@
 # Gates: pista B · espina dorsal de ingesta y frescura
 
-OWNS: ingesta/**, esquema/**, web/**, licencias/**, datos/pista_b/**, fixtures/pista_b/**, .github/workflows/**, tools/verificar_esquema.py, tools/verificar_idempotencia.py, tools/verificar_procedencia.py, tools/verificar_ventana.py, tools/verificar_frescura.py, tools/verificar_pagina.py, tools/verificar_sin_velas.py, tools/verificar_licencias.py, tools/verificar_workflows.py, tools/verificar_sin_guion_largo.py, tools/verificar_historico.py, tools/verificar_grafica_historica.py, tools/verificar_cadencia.py, tools/verificar_plaza_morelos.py, tools/verificar_frescura_cadencia.py, tools/verificar_reaparicion.py, diseno/**
+OWNS: ingesta/**, esquema/**, web/**, licencias/**, datos/pista_b/**, fixtures/pista_b/**, .github/workflows/**, tools/verificar_esquema.py, tools/verificar_idempotencia.py, tools/verificar_procedencia.py, tools/verificar_ventana.py, tools/verificar_frescura.py, tools/verificar_pagina.py, tools/verificar_sin_velas.py, tools/verificar_licencias.py, tools/verificar_workflows.py, tools/verificar_sin_guion_largo.py, tools/verificar_historico.py, tools/verificar_grafica_historica.py, tools/verificar_cadencia.py, tools/verificar_plaza_morelos.py, tools/verificar_frescura_cadencia.py, tools/verificar_reaparicion.py, tools/verificar_cadencia_medida.py, tools/verificar_ingesta_rango.py, tools/verificar_base_reconstruible.py, tools/verificar_vista_escalada.py, diseno/**
 
 Scope: ingesta diaria incremental del SNIIM y de la Central de Abasto hacia un esquema normalizado con procedencia completa por fila, el vigilante de fuentes congeladas apuntado a las fuentes nuevas desde el día uno, y una sola página que muestra los precios de hoy con su frescura y su atribución, sin gráficas de velas.
 
@@ -14,7 +14,7 @@ Cadena declarada: Python 3 en el shell del proyecto. Cada verificador es un scri
 - [x] B2: la ingesta del SNIIM corre sobre un día y es idempotente: la segunda corrida del mismo día inserta cero filas y no modifica ninguna
   CHECK: python tools/verificar_idempotencia.py --fuente sniim
   EXPECT: idempotencia sniim verificada · segunda corrida con cero inserciones
-  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=segunda corrida: 80 filas · sello f77922f63a55db31 · cero inserciones | idempotencia sniim verificada · segunda corrida con cero inserciones
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=segunda corrida: 400 filas · sello 3790a2e47b50ddaf · cero inserciones | idempotencia sniim verificada · segunda corrida con cero inserciones
 
 - [x] B3: la ingesta de la Central de Abasto corre sobre un día y es idempotente con el mismo criterio
   CHECK: python tools/verificar_idempotencia.py --fuente ficeda
@@ -29,7 +29,7 @@ Cadena declarada: Python 3 en el shell del proyecto. Cada verificador es un scri
 - [x] B5: la base respeta el artículo 108 y no es espejo del acervo: ninguna fuente guarda más profundidad que la ventana declarada, y existe al menos un indicador derivado propio calculado sobre esa ventana
   CHECK: python tools/verificar_ventana.py
   EXPECT: ventana verificada · sin espejo del acervo y con derivado propio
-  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=de 9102 derivados con historia, 2782 difieren del precio del dia | ventana verificada · sin espejo del acervo y con derivado propio
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=de 124816 derivados con historia, 38051 difieren del precio del dia | ventana verificada · sin espejo del acervo y con derivado propio
 
 - [x] B6: el vigilante de fuentes congeladas apunta a las fuentes nuevas, lee el reporte de fetch versionado y falla cuando una fuente pasa el umbral de días sin fetch bueno, probado contra un reporte de control con una fuente congelada
   CHECK: python tools/verificar_frescura.py --control-positivo fixtures/pista_b/fetch_report_congelado.json
@@ -39,7 +39,7 @@ Cadena declarada: Python 3 en el shell del proyecto. Cada verificador es un scri
 - [x] B7: la página de hoy muestra para cada precio su fecha, su fuente y su atribución, y cuando una fuente está congelada lo dice en la cara del usuario en vez de presentar el último dato bueno como si fuera de hoy, probado con un estado congelado simulado
   CHECK: python tools/verificar_pagina.py --estado-congelado-simulado
   EXPECT: pagina verificada · aviso de congelamiento visible y frescura por fila
-  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=con estado congelado simulado: 2 avisos para 2 fuentes, filas marcadas como dato detenido | pagina verificada · aviso de congelamiento visible y frescura por fila
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=con estado congelado simulado: 44 avisos para 2 fuentes, filas marcadas como dato detenido | pagina verificada · aviso de congelamiento visible y frescura por fila
 
 - [x] B8: la página no incluye gráficas de velas ni de rango alto y bajo presentadas como precio de transacción, y el mismo verificador rechaza una página de control que sí las trae
   CHECK: python tools/verificar_sin_velas.py --control-positivo fixtures/pista_b/pagina_con_velas.html
@@ -74,12 +74,12 @@ Cadena declarada: Python 3 en el shell del proyecto. Cada verificador es un scri
 - [x] B15: la base guarda la ventana declarada rellenada desde la fuente y no mas, de modo que la vista historica tenga de donde dibujarse, y el verificador falla si alguna fuente excede su ventana o si la profundidad real es tan corta que la grafica no dice nada
   CHECK: python tools/verificar_historico.py
   EXPECT: historico verificado · ventana rellenada sin exceder la declarada
-  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=9497 derivados propios conservados en la base | historico verificado · ventana rellenada sin exceder la declarada
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=129499 derivados propios conservados en la base | historico verificado · ventana rellenada sin exceder la declarada
 
 - [x] B16: la vista dibuja el historico de cada producto desde las filas crudas y no presenta mediana movil en su lugar, y el verificador recalcula la serie desde la base, la compara contra los puntos dibujados y rechaza una grafica de control construida con datos desfasados
   CHECK: python tools/verificar_grafica_historica.py --control-desfasado
   EXPECT: grafica historica verificada · recalculo coincide y control desfasado rechazado
-  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=control desfasado rechazado en las 174 series con forma | grafica historica verificada · recalculo coincide y control desfasado rechazado
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=control desfasado rechazado en las 1894 series con forma | grafica historica verificada · recalculo coincide y control desfasado rechazado
 
 - [x] B17: la cadencia de publicacion de cada plaza esta declarada en una tabla unica del codigo, la ingesta consulta igual todos los dias a la plaza semanal para poder detectar que cambie de cadencia, y existe un vigilante por plaza que falla cuando una plaza falta a SU propio dia de publicacion y no cuando calla un dia que no le toca, probado contra tres plazas de control: una diaria callada, una semanal callada en su lunes y una semanal callada un jueves
   CHECK: python tools/verificar_cadencia.py --control-callada
@@ -100,6 +100,26 @@ Cadena declarada: Python 3 en el shell del proyecto. Cada verificador es un scri
   CHECK: python tools/verificar_reaparicion.py --control-reaparicion
   EXPECT: vigilancia de reaparicion verificada · reaparicion detectada y silencio continuo tolerado
   EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=control por codigo de salida: rojo con el fixture de reaparicion, verde con el registro real | vigilancia de reaparicion verificada · reaparicion detectada y silencio continuo tolerado
+
+- [x] B21: la cadencia de cada plaza del piloto esta MEDIDA y generada por `ingesta/medir_cadencia.py`, no escrita a mano, y el verificador vuelve a consultar una muestra de plazas en la fuente y falla si la cadencia declarada no coincide con la que la fuente publica, ademas de rechazar una tabla de control con una cadencia falsa
+  CHECK: python tools/verificar_cadencia_medida.py --control-falso
+  EXPECT: cadencia medida verificada · muestra coincide con la fuente y control falso rechazado
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=reparto declarado: diaria 38, semanal 3 | cadencia medida verificada · muestra coincide con la fuente y control falso rechazado
+
+- [x] B22: la ingesta consulta por RANGO, una peticion por plaza para toda la ventana en vez de una por dia, lee la fecha de cada fila en vez de asumirla, y sigue siendo idempotente: la segunda corrida del mismo rango inserta cero filas
+  CHECK: python tools/verificar_ingesta_rango.py
+  EXPECT: ingesta por rango verificada · fecha leida por fila y segunda corrida sin inserciones
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=pedir 91 dias se rechaza: la ventana declarada es 90 | ingesta por rango verificada · fecha leida por fila y segunda corrida sin inserciones
+
+- [x] B23: la base de precios deja de versionarse y se reconstruye desde la fuente en cada corrida, de modo que el repositorio no crezca con el dato, y el verificador comprueba que esta ignorada por git, que una reconstruccion en base vacia llena la ventana declarada de una plaza, y que lo que si se versiona es solo la memoria que no se puede reconstruir
+  CHECK: python tools/verificar_base_reconstruible.py
+  EXPECT: base reconstruible verificada · no versionada y ventana rellenable desde la fuente
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=base vacia reconstruida desde la fuente: 1102 filas en 14 dias publicados con una sola peticion | base reconstruible verificada · no versionada y ventana rellenable desde la fuente
+
+- [x] B24: la vista escala a decenas de plazas sin romperse: hay un indice con una fila por plaza y una pagina por plaza, y ninguna pagina pasa el presupuesto de peso declarado; el verificador falla si una pagina lo excede y rechaza un indice de control al que le falta una plaza viva
+  CHECK: python tools/verificar_vista_escalada.py --control-incompleto
+  EXPECT: vista escalada verificada · presupuesto respetado e indice incompleto rechazado
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=control: indice sin Aguascalientes: Centro Comercial Agropec rechazado | vista escalada verificada · presupuesto respetado e indice incompleto rechazado
 
 - [ ] B12: la consulta escrita al SNIIM está enviada a info.sniim@economia.gob.mx con fecha y copia del texto en el expediente, y la petición de permiso a la Central de Abasto está enviada o registrada como pendiente con fecha
   EVIDENCE: NO CUMPLIDO · textos redactados el 20 de noviembre de 2026 en correspondencia/consulta_sniim.md y correspondencia/permiso_ficeda.md, los dos sin enviar. El envío es del fundador: esta sesión no manda correo en su nombre. Para la FICEDA falta además el destinatario, que no está publicado en el visor y se pide por el canal de atención de ficeda.com.mx. Mientras el gate siga abierto, las dos fuentes quedan en amarillo y el dato se usa como referencia citada con atribución, no como acervo redistribuido.
@@ -166,6 +186,39 @@ en CI es lo unico que GitHub notifica, y el flujo del vigilante no despliega,
 asi que ponerlo en rojo no deja el tablero sin actualizar. El mensaje lo dice
 con todas sus letras: no es una falla, es una reaparicion, y lo que toca es
 promover la plaza al piloto.
+
+B21 a B24 salen de agregar las 41 plazas vivas del SNIIM, que es lo que
+convierte en obligatorio lo que antes era opcional.
+
+B21: con tres plazas, escribir la cadencia a mano era razonable. Con 41 es una
+invitacion al error, y una cadencia declarada mal es PEOR que ninguna, porque el
+vigilante juzga el silencio contra una cita equivocada. La tabla se genera
+midiendo, y el gate vuelve a preguntarle a la fuente.
+
+B22: una peticion por dia y por plaza son 90 por 41, o sea 3,690 peticiones para
+llenar la ventana. Por rango son 41. El endpoint acepta rangos desde siempre y
+no lo estabamos usando. Y leer por rango obliga a leer la fecha de cada fila en
+vez de asumir la del dia pedido, que es mejor por si solo: captura las
+publicaciones tardias.
+
+B23 es la consecuencia incomoda. Con 41 plazas la base pasa de 10 MB a varias
+decenas, y el flujo diario la comitea entera: el repositorio crecería eso cada
+dia. La salida no es comprimir ni podar mas: es que la base DEJE de ser memoria.
+Si cada corrida reconstruye la ventana con una peticion de rango por plaza, la
+base es cache reconstruible y no hay nada que versionar. Lo que si se sigue
+versionando es la memoria que no se puede reconstruir: el reporte de fetch, que
+sabe cuando fue la ultima descarga buena, y el registro de sondas, que sabe
+cuantas veces se le pregunto a una plaza muerta.
+
+La resiliencia no se pierde con esto. Si la fuente se cae, la corrida falla, el
+despliegue no ocurre y la ultima pagina buena sigue publicada. Antes se habria
+publicado una pagina con dato viejo presentado como de hoy, que es peor.
+
+B24: 41 plazas por unas 60 cotizaciones por una grafica cada una son del orden
+de 2,500 SVG en linea, varios megabytes en una sola pagina. Una pagina por plaza
+mas un indice mantiene cada pagina en el orden de cien kilobytes, y el indice
+pasa a ser lo que de verdad hacia falta: ver de un golpe que plazas publicaron
+hoy y cuales no.
 
 B12 no lo cierra un agente: es correspondencia del fundador. Mientras esté
 abierto, la ingesta corre solo con fuentes verdes.

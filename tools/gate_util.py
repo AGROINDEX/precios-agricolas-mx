@@ -55,6 +55,20 @@ def pagina_generada():
     return destino
 
 
+def paginas_generadas():
+    """Todas las paginas publicadas: el indice y una por plaza.
+
+    Existe porque la vista dejo de ser una sola pagina. Un verificador que solo
+    mirara el indice dejaria de ver las filas de datos, que ahora viven en la
+    pagina de cada plaza, y pasaria en verde sin comprobar nada.
+    """
+    import glob
+
+    indice = pagina_generada()
+    carpeta = os.path.join(os.path.dirname(indice), "plaza")
+    return [indice] + sorted(glob.glob(os.path.join(carpeta, "*.html")))
+
+
 class Fallo(Exception):
     pass
 

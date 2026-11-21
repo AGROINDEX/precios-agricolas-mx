@@ -25,7 +25,7 @@ sys.path.insert(0, CARPETA)
 from datos import VEREDICTOS, cargar, frase  # noqa: E402
 from marcado import CABEZA, ESTILO_GRAFICA, escapar, grafica, pesos  # noqa: E402
 
-ORIGEN = "Michoacan: Mercado de Abasto de Morelia"
+ORIGEN = "Michoacán: Mercado de Abasto de Morelia"
 DESTINO = "DF: Central de Abasto de Iztapalapa DF"
 
 ESTILO = """

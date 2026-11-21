@@ -38,18 +38,17 @@ def sello(base):
 def verificar_sniim(base, reporte):
     import sniim
 
-    # El SNIIM no publica sabados, domingos ni festivos. Se busca hacia atras el
-    # dia mas reciente con publicacion, dentro de una semana, antes de medir.
-    dia = None
-    for atras in range(0, 8):
-        candidato = date.today() - timedelta(days=atras)
-        sniim.correr(candidato, ["100"], base, reporte)
-        filas, _ = sello(base)
-        if filas:
-            dia = candidato
-            break
-    exigir(dia is not None, "ninguno de los ultimos ocho dias trajo filas del SNIIM")
-    return lambda: sniim.correr(dia, ["100"], base, reporte), f"dia medido: {dia.isoformat()}"
+    # La ingesta pide un RANGO, una peticion por plaza. Se mide sobre una
+    # ventana corta y reciente: si trae filas, el rango sirve para la prueba.
+    hasta = date.today()
+    desde = hasta - timedelta(days=7)
+    sniim.correr(desde, hasta, ["100"], base, reporte)
+    filas, _ = sello(base)
+    exigir(filas, "la ventana de los ultimos ocho dias no trajo filas del SNIIM")
+    return (
+        lambda: sniim.correr(desde, hasta, ["100"], base, reporte),
+        f"rango medido: {desde.isoformat()} a {hasta.isoformat()}, {filas} filas",
+    )
 
 
 def verificar_ficeda(base, reporte):

@@ -33,8 +33,25 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Recuperar la base de la corrida anterior
+        # La base NO se versiona: con 42 plazas pesa del orden de 130 MB y
+        # comitearla cada dia haria crecer el repositorio eso diario. Vive en la
+        # cache del corredor, que es exactamente para lo que la cache existe.
+        #
+        # Si la cache se perdio, la ingesta lo nota sola: `--dias auto` mira la
+        # base y pide la ventana completa en vez de los ultimos dias. Perder la
+        # cache cuesta unos minutos de descarga, no un hueco en el historico.
+        uses: actions/cache@v4
+        with:
+          path: datos/pista_b/precios.db
+          key: precios-db-${{ github.run_id }}
+          restore-keys: |
+            precios-db-
+
       - name: Ingesta del SNIIM
-        run: python ingesta/sniim.py
+        # Una peticion de rango por plaza, no una por dia: con 42 plazas y 90
+        # dias, por dia serian 3,690 peticiones y por rango son 42.
+        run: python ingesta/sniim.py --dias auto
         continue-on-error: true
 
       - name: Ingesta de la Central de Abasto
@@ -56,20 +73,16 @@ jobs:
         #                       muerta no tiene ni una fila en la base, asi que
         #                       sin este archivo no habria forma de saber que se
         #                       le pregunto ni de notar el dia en que vuelva.
-        #   precios.db          el corredor de CI es efimero. Sin la base
-        #                       versionada, cada corrida empezaria vacia y la
-        #                       mediana de siete dias se calcularia sobre un
-        #                       solo dia, que es un numero que miente.
+        #
+        # Las dos son memoria que NO se puede reconstruir desde la fuente, y las
+        # dos pesan kilobytes. La base si se reconstruye, asi que no entra aqui:
+        # vive en la cache del corredor.
         #
         # La pagina NO se versiona: la construye el flujo de publicacion desde
         # esta misma base, asi que no hay dos escritores del mismo archivo.
-        #
-        # La base se mantiene chica por diseno: la poda de ventana corre en cada
-        # ingesta. El dia que crezca de mas, el reemplazo es Supabase, no un
-        # archivo mas grande en el repositorio.
         run: |
           git config user.name "ingesta-diaria"
           git config user.email "noreply@users.noreply.github.com"
-          git add datos/pista_b/_fetch_report.json datos/pista_b/_sondas.json datos/pista_b/precios.db
+          git add datos/pista_b/_fetch_report.json datos/pista_b/_sondas.json
           git diff --staged --quiet || git commit -m "ingesta diaria $(date -u +%F)"
           git push
