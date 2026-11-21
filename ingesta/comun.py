@@ -44,6 +44,74 @@ FUENTES = {
     },
 }
 
+# Cadencia de publicacion DECLARADA por plaza, con el umbral de silencio que le
+# corresponde.
+#
+# POR QUE EXISTE. El silencio de una plaza solo se puede juzgar contra su propia
+# cadencia. La Central de Abasto de Cuautla dejo de publicar el 16 de octubre de
+# 2025 y nadie lo noto, porque el vigilante mide por FUENTE y el SNIIM seguia
+# bajando todos los dias gracias a Iztapalapa. Y al revez: el Mercado Adolfo
+# Lopez Mateos publica solo los lunes, asi que juzgarlo con el umbral diario lo
+# declararia muerto cada martes.
+#
+# `dias` usa la numeracion de datetime.weekday(): lunes 0, domingo 6. En una
+# plaza diaria es None y se asume la semana habil, porque el SNIIM no publica
+# sabados ni domingos.
+CADENCIAS = {
+    "DF: Central de Abasto de Iztapalapa DF": {
+        "cadencia": "diaria",
+        "dias": None,
+        "umbral_dias": 3,
+    },
+    "Michoacan: Mercado de Abasto de Morelia": {
+        "cadencia": "diaria",
+        "dias": None,
+        "umbral_dias": 3,
+    },
+    "Morelos: Mercado Adolfo Lopez Mateos de Cuernavaca": {
+        "cadencia": "semanal",
+        "dias": [0],
+        # Diez dias son el lunes esperado mas la misma holgura de tres dias que
+        # se le da a una plaza diaria. Menos que eso grita cada semana.
+        "umbral_dias": 10,
+    },
+    "DF: Central de Abasto de Iztapalapa (FICEDA)": {
+        "cadencia": "diaria",
+        "dias": None,
+        "umbral_dias": 3,
+    },
+}
+
+# Una plaza sin cadencia declarada se trata como diaria y se DICE que no esta
+# declarada, en vez de inventarle una cadencia que la haga ver sana.
+CADENCIA_SIN_DECLARAR = {"cadencia": "sin declarar", "dias": None, "umbral_dias": 3}
+
+
+def cadencia(mercado):
+    return CADENCIAS.get(mercado, CADENCIA_SIN_DECLARAR)
+
+
+def toca_publicar(mercado, dia):
+    """Le toca publicar a esta plaza ese dia, segun su cadencia declarada."""
+    regla = cadencia(mercado)
+    if regla["dias"] is not None:
+        return dia.weekday() in regla["dias"]
+    return dia.weekday() < 5  # el SNIIM no publica sabados ni domingos
+
+
+def frase_cadencia(mercado):
+    """Como se le dice al usuario, sin jerga."""
+    regla = cadencia(mercado)
+    if regla["cadencia"] == "semanal":
+        nombres = ["los lunes", "los martes", "los miercoles", "los jueves",
+                   "los viernes", "los sabados", "los domingos"]
+        dias = " y ".join(nombres[d] for d in regla["dias"])
+        return f"esta plaza publica una vez por semana, {dias}"
+    if regla["cadencia"] == "diaria":
+        return "esta plaza publica cada dia habil"
+    return "cadencia de esta plaza todavia sin declarar"
+
+
 CAMPOS = (
     "fuente",
     "fecha_dato",

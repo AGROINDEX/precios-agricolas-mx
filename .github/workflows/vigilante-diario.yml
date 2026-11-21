@@ -47,6 +47,23 @@ jobs:
       - name: Frescura de las fuentes en vivo
         run: python ingesta/check_fuentes_stale.py
 
+      - name: Control positivo del vigilante de cadencia
+        # Mismo razonamiento que el control de arriba, y aqui hace mas falta:
+        # el vigilante de cadencia tiene que distinguir una plaza semanal
+        # callada un jueves, que esta al dia, de la misma plaza callada un
+        # lunes, que falto. Un vigilante que siempre dijera "al dia" pasaria el
+        # paso siguiente en verde.
+        if: always()
+        run: python tools/verificar_cadencia.py --control-callada
+
+      - name: Plazas que faltaron a su propia cita
+        # Por plaza y contra su cadencia DECLARADA, no por fuente. El vigilante
+        # de fuentes congeladas mide el SNIIM entero, asi que una plaza puede
+        # morirse sin que se note mientras Iztapalapa siga publicando: es como
+        # murio la Central de Abasto de Cuautla en octubre de 2025.
+        if: always()
+        run: python ingesta/check_cadencia.py
+
       - name: Plazas que dejaron de moverse
         # Avisa del cambio de estado, no del estado: una plaza quieta conocida
         # se reporta como nota y solo la transicion pone la corrida en rojo.

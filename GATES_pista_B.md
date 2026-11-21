@@ -1,6 +1,6 @@
 # Gates: pista B · espina dorsal de ingesta y frescura
 
-OWNS: ingesta/**, esquema/**, web/**, licencias/**, datos/pista_b/**, fixtures/pista_b/**, .github/workflows/**, tools/verificar_esquema.py, tools/verificar_idempotencia.py, tools/verificar_procedencia.py, tools/verificar_ventana.py, tools/verificar_frescura.py, tools/verificar_pagina.py, tools/verificar_sin_velas.py, tools/verificar_licencias.py, tools/verificar_workflows.py, tools/verificar_sin_guion_largo.py, tools/verificar_historico.py, tools/verificar_grafica_historica.py, diseno/**
+OWNS: ingesta/**, esquema/**, web/**, licencias/**, datos/pista_b/**, fixtures/pista_b/**, .github/workflows/**, tools/verificar_esquema.py, tools/verificar_idempotencia.py, tools/verificar_procedencia.py, tools/verificar_ventana.py, tools/verificar_frescura.py, tools/verificar_pagina.py, tools/verificar_sin_velas.py, tools/verificar_licencias.py, tools/verificar_workflows.py, tools/verificar_sin_guion_largo.py, tools/verificar_historico.py, tools/verificar_grafica_historica.py, tools/verificar_cadencia.py, tools/verificar_plaza_morelos.py, tools/verificar_frescura_cadencia.py, diseno/**
 
 Scope: ingesta diaria incremental del SNIIM y de la Central de Abasto hacia un esquema normalizado con procedencia completa por fila, el vigilante de fuentes congeladas apuntado a las fuentes nuevas desde el día uno, y una sola página que muestra los precios de hoy con su frescura y su atribución, sin gráficas de velas.
 
@@ -79,7 +79,22 @@ Cadena declarada: Python 3 en el shell del proyecto. Cada verificador es un scri
 - [x] B16: la vista dibuja el historico de cada producto desde las filas crudas y no presenta mediana movil en su lugar, y el verificador recalcula la serie desde la base, la compara contra los puntos dibujados y rechaza una grafica de control construida con datos desfasados
   CHECK: python tools/verificar_grafica_historica.py --control-desfasado
   EXPECT: grafica historica verificada · recalculo coincide y control desfasado rechazado
-  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=control desfasado rechazado en las 119 series con forma | grafica historica verificada · recalculo coincide y control desfasado rechazado
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=control desfasado rechazado en las 174 series con forma | grafica historica verificada · recalculo coincide y control desfasado rechazado
+
+- [x] B17: la cadencia de publicacion de cada plaza esta declarada en una tabla unica del codigo, la ingesta consulta igual todos los dias a la plaza semanal para poder detectar que cambie de cadencia, y existe un vigilante por plaza que falla cuando una plaza falta a SU propio dia de publicacion y no cuando calla un dia que no le toca, probado contra tres plazas de control: una diaria callada, una semanal callada en su lunes y una semanal callada un jueves
+  CHECK: python tools/verificar_cadencia.py --control-callada
+  EXPECT: cadencia verificada · falta en su dia detectada y silencio esperado tolerado
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=control: 2 transiciones detectadas (diaria y semanal), semanal al dia tolerada mirandola el jueves 2026-11-19, 2 calladas viejas degradadas a nota | cadencia verificada · falta en su dia detectada y silencio esperado tolerado
+
+- [x] B18: la plaza de Morelos esta en el piloto con su ventana declarada rellenada desde la fuente, y el verificador recuenta desde las filas crudas que todos sus dias publicados caen en el dia de la semana declarado y que ninguno excede la ventana
+  CHECK: python tools/verificar_plaza_morelos.py
+  EXPECT: plaza de Morelos verificada · dias publicados dentro de la ventana y en su cadencia
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=control positivo: el dia 2026-11-10 fuera de cadencia fue rechazado | plaza de Morelos verificada · dias publicados dentro de la ventana y en su cadencia
+
+- [x] B19: la frescura de una plaza semanal se expresa en publicaciones y no solo en dias de calendario, de modo que publicar cada lunes no se presente como dato detenido, y la pagina dice la cadencia de cada plaza junto a su ultimo corte; el verificador rechaza una pagina de control que presenta la plaza semanal como diaria y comprueba que una plaza diaria callada cinco dias si se reporta como detenida
+  CHECK: python tools/verificar_frescura_cadencia.py --control-positivo
+  EXPECT: frescura por cadencia verificada · control de plaza semanal como diaria rechazado
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\user\Desktop\Claude Code\precios-agricolas; path=a07f07046df2/34 entries; output=control: plaza semanal al dia sin aviso de falta, plaza diaria callada cinco dias reportada | frescura por cadencia verificada · control de plaza semanal como diaria rechazado
 
 - [ ] B12: la consulta escrita al SNIIM está enviada a info.sniim@economia.gob.mx con fecha y copia del texto en el expediente, y la petición de permiso a la Central de Abasto está enviada o registrada como pendiente con fecha
   EVIDENCE: NO CUMPLIDO · textos redactados el 20 de noviembre de 2026 en correspondencia/consulta_sniim.md y correspondencia/permiso_ficeda.md, los dos sin enviar. El envío es del fundador: esta sesión no manda correo en su nombre. Para la FICEDA falta además el destinatario, que no está publicado en el visor y se pide por el canal de atención de ficeda.com.mx. Mientras el gate siga abierto, las dos fuentes quedan en amarillo y el dato se usa como referencia citada con atribución, no como acervo redistribuido.
@@ -111,6 +126,23 @@ B16 compara los puntos dibujados contra la serie recalculada desde las filas
 crudas. Sin esa comparacion, una grafica bonita con los datos de otro producto
 pasaria el gate, que es el modo exacto en que una vista miente sin que nadie lo
 note.
+
+B17, B18 y B19 salen de una correccion de la medicion del 20 de noviembre de
+2026. Se habia concluido que las dos plazas de Morelos del SNIIM publican cero,
+y era falso: Cuernavaca publica todos los lunes. La sonda preguntaba por dias
+sueltos, y un dia suelto cae en lunes una vez cada siete. De ahi la leccion que
+estos tres gates vuelven estructura: una plaza con cadencia propia necesita que
+su cadencia este DECLARADA, porque si no, su silencio normal es indistinguible
+de su muerte. Cuautla murio el 16 de octubre de 2025 y nadie lo noto.
+
+B17 no deja de consultar a la plaza semanal los dias que no le tocan, aunque
+sea gasto: dejar de preguntar es la unica forma de no enterarse de que cambio de
+cadencia. Lo que cambia no es la consulta, es como se JUZGA el silencio.
+
+B19 existe porque la medida de edad del valor cuenta dias de calendario. Para
+una plaza semanal, un precio que cambia en cada publicacion tiene siete dias de
+edad, y decirle al usuario que la mitad de los precios lleva siete dias sin
+moverse describiria como estancada a una plaza que esta al dia.
 
 B12 no lo cierra un agente: es correspondencia del fundador. Mientras esté
 abierto, la ingesta corre solo con fuentes verdes.

@@ -67,6 +67,26 @@ se puede recalcular.
 python ingesta/check_plazas_quietas.py
 ```
 
+**Cadencia declarada por plaza.** Tres plazas del piloto publican cada dia
+habil y la de Morelos publica una vez por semana, los lunes. El silencio de una
+plaza solo se puede juzgar contra su propia cadencia: con el umbral diario, la
+plaza semanal se declararia muerta cada martes, y con el umbral semanal una
+plaza diaria podria estar tres dias caida sin que nadie avisara. La cadencia
+vive declarada en `comun.CADENCIAS`, a la vista, y hay un vigilante POR PLAZA,
+porque el de fuentes congeladas mide la fuente entera: mientras Iztapalapa
+publique, el SNIIM se ve sano aunque una plaza lleve un ano muerta. Asi se
+murio la Central de Abasto de Cuautla, el 16 de octubre de 2025, sin que nadie
+lo notara.
+
+```powershell
+python ingesta/check_cadencia.py
+```
+
+A la plaza semanal se le pregunta igual todos los dias, aunque seis de cada
+siete devuelvan vacio. Dejar de preguntar ahorraria peticiones y costaria lo
+unico que importa: enterarse el dia en que cambie de cadencia. Lo que cambia no
+es la consulta, es como se juzga el silencio.
+
 **Frescura declarada siempre.** Cada precio lleva su fecha y su fuente. Si una
 fuente se congela, la pagina lo dice en la cara del usuario en vez de mostrar el
 ultimo dato bueno como si fuera de hoy. El vigilante corre en su propio flujo de

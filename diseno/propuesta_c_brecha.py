@@ -171,7 +171,7 @@ def construir(salida=None, ruta_base=None):
             f'<div class="nombre">{escapar(bloque["mercado"])}</div>'
             f'<div class="pie"><span class="punto {veredicto}"></span>'
             f'{escapar(VEREDICTOS[veredicto])} · corte {escapar(bloque["fecha"])}'
-            f"{retraso}</div></div>"
+            f"{retraso} · {escapar(bloque['cadencia'])}</div></div>"
         )
         if rol == "plaza en region productora":
             partes.append('<div class="flecha">&rarr;</div>')

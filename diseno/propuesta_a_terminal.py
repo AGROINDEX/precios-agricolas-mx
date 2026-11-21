@@ -162,6 +162,7 @@ def construir(salida=None, ruta_base=None):
         partes.append(f'<span class="etq">corte {escapar(bloque["fecha"])}</span>')
         partes.append(f'<span class="etq {veredicto}">{escapar(VEREDICTOS[veredicto])}</span>')
         partes.append(f'<span class="etq">{escapar(etiqueta_base(bloque["filas"]))}</span>')
+        partes.append(f'<span class="etq">{escapar(bloque["cadencia"])}</span>')
         partes.append("</div>")
         detalle = frase(pulso) + ". " if pulso else ""
         partes.append(

@@ -37,7 +37,7 @@ import sys
 from datetime import datetime
 
 import comun_bootstrap  # noqa: F401
-from comun import conectar
+from comun import cadencia, conectar
 
 # Un producto necesita al menos estos dias publicados para opinar si esta plano.
 MINIMO_DIAS = 5
@@ -79,15 +79,25 @@ def series_por_plaza(conexion, hasta=None):
     return series
 
 
-def medir_plaza(productos):
-    """Devuelve las metricas de una plaza a partir de sus series por producto."""
+def medir_plaza(productos, mercado=None):
+    """Devuelve las metricas de una plaza a partir de sus series por producto.
+
+    `mercado` es opcional solo para no romper a quien ya llamaba con un
+    argumento. Sin el, la edad del valor se reporta unicamente en dias de
+    calendario, que es lo correcto para una plaza diaria y engañoso para una
+    semanal: un precio que cambia en cada publicacion semanal tiene siete dias
+    de edad y no esta detenido.
+    """
     fechas = sorted({fecha for puntos in productos.values() for fecha, _valor in puntos})
     ultimo = fechas[-1]
     anterior = fechas[-2] if len(fechas) > 1 else None
 
+    posicion = {fecha: indice for indice, fecha in enumerate(fechas)}
+
     movieron = 0
     comparables = 0
     edades = []
+    edades_pub = []
     planos = 0
     con_historia = 0
 
@@ -113,6 +123,10 @@ def medir_plaza(productos):
                 - datetime.strptime(ultimo_cambio, "%Y-%m-%d").date()
             ).days
         )
+        # La misma edad contada en PUBLICACIONES. Es la que no depende de la
+        # cadencia: cero publicaciones significa que cambio en el ultimo corte,
+        # publique la plaza cada dia o cada lunes.
+        edades_pub.append(posicion[ultimo] - posicion[ultimo_cambio])
 
         dias_producto = len({fecha for fecha, _valor in puntos})
         if dias_producto >= MINIMO_DIAS:
@@ -145,6 +159,10 @@ def medir_plaza(productos):
         "movieron": movieron,
         "prop_movio_ultimo": None if prop_movio is None else round(prop_movio, 4),
         "mediana_edad_valor": None if not edades else round(statistics.median(edades), 1),
+        "mediana_edad_publicaciones": (
+            None if not edades_pub else round(statistics.median(edades_pub), 1)
+        ),
+        "cadencia": cadencia(mercado)["cadencia"] if mercado else "sin declarar",
         "productos_con_historia": con_historia,
         "planos": planos,
         "prop_planos": None if prop_planos is None else round(prop_planos, 4),
@@ -156,7 +174,7 @@ def medir(conexion, hasta=None):
     series = series_por_plaza(conexion, hasta)
     medidas = {}
     for (fuente, mercado), productos in series.items():
-        medidas.setdefault(fuente, {})[mercado] = medir_plaza(productos)
+        medidas.setdefault(fuente, {})[mercado] = medir_plaza(productos, mercado)
     return medidas
 
 
@@ -166,7 +184,19 @@ def frase(medida):
         return "sin dia anterior publicado, todavia no se puede medir el movimiento"
     movio = medida["prop_movio_ultimo"] * 100
     partes = [f"{movio:.0f} por ciento de los productos cambio de precio en el ultimo corte"]
-    if medida["mediana_edad_valor"] is not None:
+    # En una plaza semanal, decir "lleva 7 dias sin moverse" describiria como
+    # detenido un precio que cambio en la ultima publicacion. Se cuenta en
+    # publicaciones, que es la unidad en que esa plaza existe.
+    if medida.get("cadencia") == "semanal" and medida.get("mediana_edad_publicaciones") is not None:
+        publicaciones = medida["mediana_edad_publicaciones"]
+        if publicaciones < 1:
+            partes.append("la mitad de los precios cambio en la ultima publicacion semanal")
+        else:
+            partes.append(
+                f"la mitad de los precios lleva {publicaciones:.0f} publicaciones semanales"
+                " o mas sin moverse"
+            )
+    elif medida["mediana_edad_valor"] is not None:
         partes.append(f"la mitad de los precios lleva {medida['mediana_edad_valor']:.0f} dias o mas sin moverse")
     if medida["prop_planos"]:
         partes.append(

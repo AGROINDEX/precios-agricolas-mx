@@ -46,9 +46,15 @@ PLAZAS = {
     "100": "DF: Central de Abasto de Iztapalapa DF",
     "160": "Michoacan: Mercado de Abasto de Morelia",
     "140": "Jalisco: Mercado de Abasto de Guadalajara",
+    "172": "Morelos: Mercado Adolfo Lopez Mateos de Cuernavaca",
 }
 
-PILOTO = ["100", "160"]
+# La 172 entra al piloto aunque publique UNA vez por semana, y se consulta
+# igual todos los dias. Dejar de preguntarle los dias que no le tocan ahorraria
+# seis peticiones de siete y costaria lo unico que importa: enterarse el dia en
+# que cambie de cadencia. Lo que cambia no es la consulta, es como se juzga el
+# silencio, y eso vive en la tabla CADENCIAS de comun.py.
+PILOTO = ["100", "160", "172"]
 
 ENCABEZADO = ("producto", "calidad", "presentacion", "origen")
 

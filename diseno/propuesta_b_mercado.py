@@ -161,6 +161,7 @@ def construir(salida=None, ruta_base=None):
         partes.append(
             f'<p class="sub">Corte del {escapar(bloque["fecha"])}{retraso} · '
             f'{escapar(etiqueta_base(bloque["filas"]))} · '
+            f'{escapar(bloque["cadencia"])} · '
             f'{escapar(bloque["fuente"]["atribucion"])}</p>'
         )
         if pulso:

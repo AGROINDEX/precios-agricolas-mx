@@ -11,7 +11,7 @@ import sys
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(RAIZ, "ingesta"))
 
-from comun import conectar  # noqa: E402
+from comun import conectar, frase_cadencia  # noqa: E402
 from frescura_real import VEREDICTOS, frase, medir  # noqa: E402
 
 # Toda la ventana declarada. La grafica no se recorta a mano: si la base guarda
@@ -85,6 +85,9 @@ def cargar(ruta_base=None):
                     "fecha": ultima,
                     "filas": filas,
                     "pulso": movimiento.get(clave, {}).get(mercado),
+                    # La cadencia viaja con el bloque: una maqueta que no la
+                    # diga presenta como rota a la plaza que publica los lunes.
+                    "cadencia": frase_cadencia(mercado),
                 }
             )
 
@@ -123,4 +126,4 @@ def etiqueta_base(filas):
     return "cuidado: esta plaza mezcla bases de precio distintas"
 
 
-__all__ = ["cargar", "etiqueta_base", "VEREDICTOS", "frase", "HISTORIA"]
+__all__ = ["cargar", "etiqueta_base", "VEREDICTOS", "frase", "frase_cadencia", "HISTORIA"]

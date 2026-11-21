@@ -25,9 +25,10 @@ from datetime import date, datetime, timezone
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(RAIZ, "ingesta"))
 
+from check_cadencia import evaluar as evaluar_cadencia  # noqa: E402
 from check_fuentes_stale import evaluar  # noqa: E402
 from frescura_real import VEREDICTOS, frase, medir  # noqa: E402
-from comun import conectar  # noqa: E402
+from comun import conectar, frase_cadencia  # noqa: E402
 from grafica import ESTILO_GRAFICA, grafica  # noqa: E402
 
 SALIDA = os.path.join(RAIZ, "web", "index.html")
@@ -102,6 +103,16 @@ def construir(ruta_base=None, ruta_reporte=None, salida=SALIDA):
     }
 
     movimiento = medir(conexion)
+
+    # La cadencia de cada plaza y su cumplimiento no se inventan aqui: los da el
+    # mismo vigilante que corre en CI, igual que el aviso de congelamiento. Dos
+    # implementaciones de la misma regla acabarian diciendo cosas distintas.
+    faltaron, calladas, _al_dia = evaluar_cadencia(conexion)
+    cadencias = {}
+    for registro in faltaron:
+        cadencias[(registro["fuente"], registro["mercado"])] = ("falto", registro)
+    for registro in calladas:
+        cadencias[(registro["fuente"], registro["mercado"])] = ("callada", registro)
 
     with open(ruta_reporte or REPORTE, encoding="utf-8") as archivo:
         reporte = json.load(archivo)
@@ -189,7 +200,30 @@ def construir(ruta_base=None, ruta_reporte=None, salida=SALIDA):
         rancia = clave in claves_congeladas
         hoy = date.today().isoformat()
         etiqueta_fecha = f"corte del {fecha}" + (" · no es de hoy" if fecha != hoy else "")
+        # La cadencia va pegada al corte. Sin ella, una plaza que publica los
+        # lunes se lee como una plaza rota cada martes, y el usuario que mira el
+        # jueves no tiene forma de saber cual de las dos cosas es.
+        etiqueta_fecha += " · " + frase_cadencia(mercado)
         partes.append(f"<h2>{escapar(mercado)}</h2>")
+        estado_cadencia, registro_cadencia = cadencias.get((clave, mercado), (None, None))
+        if estado_cadencia == "falto":
+            partes.append(
+                f'<div class="aviso"><strong>Esta plaza falto a su publicacion.</strong> '
+                f"Le tocaba publicar el {escapar(registro_cadencia['ultima_cita'])} y su ultimo "
+                f"corte es del {escapar(registro_cadencia['ultimo'])}, "
+                f"{registro_cadencia['dias_sin_publicar']} dias atras. "
+                f"Cumplio {registro_cadencia['cumplidas']} de "
+                f"{registro_cadencia['citas']} publicaciones esperadas desde que se sigue. "
+                "Lo que se muestra abajo es su ultimo corte y no es de hoy.</div>"
+            )
+        elif estado_cadencia == "callada":
+            partes.append(
+                f'<div class="aviso"><strong>Esta plaza lleva callada '
+                f"{registro_cadencia['dias_sin_publicar']} dias.</strong> "
+                f"Cumplio {registro_cadencia['cumplidas']} de "
+                f"{registro_cadencia['citas']} publicaciones esperadas desde que se sigue. "
+                "Lo que se muestra abajo es su ultimo corte y no es de hoy.</div>"
+            )
         bases = {fila[8] for fila in filas}
         if bases == {"kilogramo"}:
             nota_base = "precios por kilogramo, calculados por la fuente"
@@ -261,6 +295,15 @@ def construir(ruta_base=None, ruta_reporte=None, salida=SALIDA):
         "que sus numeros llevan dias quietos, y que conviene tomarlos como referencia gruesa. "
         "Se marca asi cuando la mitad o mas de sus productos no cambio ni una vez en la ventana, "
         "o cuando menos del cinco por ciento se movio en el ultimo corte.</p>"
+    )
+    partes.append(
+        "<p>Cada plaza publica a su propio ritmo y ese ritmo esta declarado, no adivinado. "
+        "Las centrales de abasto grandes publican cada dia habil y la plaza de Morelos publica "
+        "una vez por semana, los lunes. Por eso el aviso de que una plaza falto a su "
+        "publicacion se juzga contra su propia cadencia: una plaza semanal callada un jueves "
+        "esta al dia, y la misma plaza callada un lunes no lo esta. Para una plaza semanal, la "
+        "antiguedad de los precios se cuenta en publicaciones y no en dias, porque un precio que "
+        "cambio en la ultima publicacion no esta detenido aunque tenga siete dias.</p>"
     )
     partes.append(
         "<p>Una advertencia que importa al comparar plazas: el SNIIM publica el precio por "
