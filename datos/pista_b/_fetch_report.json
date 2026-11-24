@@ -1,21 +1,21 @@
 {
-  "actualizado_en": "2026-11-24T00:31:28+00:00",
+  "actualizado_en": "2026-11-24T22:53:06+00:00",
   "fuentes": {
     "FICEDA_CDMX": {
       "critical": true,
-      "filas_ultimo_fetch": 80,
+      "filas_ultimo_fetch": 0,
       "nombre": "Central de Abasto de la Ciudad de Mexico · FICEDA",
-      "ultimo_detalle": "80 filas, 80 nuevas, 0 repetidas, corte 2026-11-23",
-      "ultimo_fetch_bueno": "2026-11-24T00:31:28+00:00",
-      "ultimo_intento": "2026-11-24T00:31:28+00:00"
+      "ultimo_detalle": "80 filas, 0 nuevas, 80 repetidas, corte 2026-11-23",
+      "ultimo_fetch_bueno": "2026-11-24T22:53:06+00:00",
+      "ultimo_intento": "2026-11-24T22:53:06+00:00"
     },
     "SNIIM_FYH": {
       "critical": true,
-      "filas_ultimo_fetch": 2190,
+      "filas_ultimo_fetch": 2233,
       "nombre": "SNIIM · Secretaria de Economia, frutas y hortalizas",
-      "ultimo_detalle": "190: 468 filas, 93 nuevas, 375 repetidas · 140: 440 filas, 88 nuevas, 352 repetidas · 160: 425 filas, 85 nuevas, 340 repetidas · 141: 420 filas, 84 nuevas, 336 repetidas · 100: 400 filas, 80 nuevas, 320 repetidas · 181: 400 filas, 80 nuevas, 320 repetidas · 180: 400 filas, 80 nuevas, 320 repetidas · 33: 350 filas, 70 nuevas, 280 repetidas · 230: 345 filas, 69 nuevas, 276 repetidas · 210: 330 filas, 66 nuevas, 264 repetidas · 306: 315 filas, 63 nuevas, 252 repetidas · 301: 305 filas, 61 nuevas, 244 repetidas",
-      "ultimo_fetch_bueno": "2026-11-24T00:31:27+00:00",
-      "ultimo_intento": "2026-11-24T00:31:27+00:00"
+      "ultimo_detalle": "190: 561 filas, 93 nuevas, 468 repetidas · 140: 528 filas, 88 nuevas, 440 repetidas · 160: 510 filas, 85 nuevas, 425 repetidas · 141: 504 filas, 84 nuevas, 420 repetidas · 100: 480 filas, 80 nuevas, 400 repetidas · 181: 480 filas, 80 nuevas, 400 repetidas · 180: 480 filas, 80 nuevas, 400 repetidas · 33: 420 filas, 70 nuevas, 350 repetidas · 230: 414 filas, 69 nuevas, 345 repetidas · 210: 396 filas, 66 nuevas, 330 repetidas · 306: 378 filas, 63 nuevas, 315 repetidas · 301: 366 filas, 61 nuevas, 305 repetidas",
+      "ultimo_fetch_bueno": "2026-11-24T22:53:05+00:00",
+      "ultimo_intento": "2026-11-24T22:53:05+00:00"
     }
   }
 }
