@@ -1,21 +1,21 @@
 {
-  "actualizado_en": "2026-11-24T22:53:06+00:00",
+  "actualizado_en": "2026-11-25T22:12:25+00:00",
   "fuentes": {
     "FICEDA_CDMX": {
       "critical": true,
-      "filas_ultimo_fetch": 0,
+      "filas_ultimo_fetch": 80,
       "nombre": "Central de Abasto de la Ciudad de Mexico · FICEDA",
-      "ultimo_detalle": "80 filas, 0 nuevas, 80 repetidas, corte 2026-11-23",
-      "ultimo_fetch_bueno": "2026-11-24T22:53:06+00:00",
-      "ultimo_intento": "2026-11-24T22:53:06+00:00"
+      "ultimo_detalle": "80 filas, 80 nuevas, 0 repetidas, corte 2026-11-24",
+      "ultimo_fetch_bueno": "2026-11-25T22:12:25+00:00",
+      "ultimo_intento": "2026-11-25T22:12:25+00:00"
     },
     "SNIIM_FYH": {
       "critical": true,
       "filas_ultimo_fetch": 2233,
       "nombre": "SNIIM · Secretaria de Economia, frutas y hortalizas",
-      "ultimo_detalle": "190: 561 filas, 93 nuevas, 468 repetidas · 140: 528 filas, 88 nuevas, 440 repetidas · 160: 510 filas, 85 nuevas, 425 repetidas · 141: 504 filas, 84 nuevas, 420 repetidas · 100: 480 filas, 80 nuevas, 400 repetidas · 181: 480 filas, 80 nuevas, 400 repetidas · 180: 480 filas, 80 nuevas, 400 repetidas · 33: 420 filas, 70 nuevas, 350 repetidas · 230: 414 filas, 69 nuevas, 345 repetidas · 210: 396 filas, 66 nuevas, 330 repetidas · 306: 378 filas, 63 nuevas, 315 repetidas · 301: 366 filas, 61 nuevas, 305 repetidas",
+      "ultimo_detalle": "190: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 140: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 160: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 141: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 100: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 181: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 180: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 33: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 230: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 210: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 306: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 301: URLError <urlopen error [Errno -3] Temporary failure in name resolution>",
       "ultimo_fetch_bueno": "2026-11-24T22:53:05+00:00",
-      "ultimo_intento": "2026-11-24T22:53:05+00:00"
+      "ultimo_intento": "2026-11-25T22:12:25+00:00"
     }
   }
 }
