@@ -1,21 +1,21 @@
 {
-  "actualizado_en": "2026-11-25T22:12:25+00:00",
+  "actualizado_en": "2026-11-26T22:04:22+00:00",
   "fuentes": {
     "FICEDA_CDMX": {
       "critical": true,
       "filas_ultimo_fetch": 80,
       "nombre": "Central de Abasto de la Ciudad de Mexico · FICEDA",
-      "ultimo_detalle": "80 filas, 80 nuevas, 0 repetidas, corte 2026-11-24",
-      "ultimo_fetch_bueno": "2026-11-25T22:12:25+00:00",
-      "ultimo_intento": "2026-11-25T22:12:25+00:00"
+      "ultimo_detalle": "80 filas, 80 nuevas, 0 repetidas, corte 2026-11-26",
+      "ultimo_fetch_bueno": "2026-11-26T22:04:22+00:00",
+      "ultimo_intento": "2026-11-26T22:04:22+00:00"
     },
     "SNIIM_FYH": {
       "critical": true,
-      "filas_ultimo_fetch": 2233,
+      "filas_ultimo_fetch": 4266,
       "nombre": "SNIIM · Secretaria de Economia, frutas y hortalizas",
-      "ultimo_detalle": "190: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 140: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 160: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 141: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 100: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 181: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 180: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 33: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 230: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 210: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 306: URLError <urlopen error [Errno -3] Temporary failure in name resolution> · 301: URLError <urlopen error [Errno -3] Temporary failure in name resolution>",
-      "ultimo_fetch_bueno": "2026-11-24T22:53:05+00:00",
-      "ultimo_intento": "2026-11-25T22:12:25+00:00"
+      "ultimo_detalle": "190: 747 filas, 186 nuevas, 561 repetidas · 140: 704 filas, 182 nuevas, 522 repetidas · 160: 680 filas, 170 nuevas, 510 repetidas · 141: 672 filas, 168 nuevas, 504 repetidas · 100: 640 filas, 160 nuevas, 480 repetidas · 181: 640 filas, 160 nuevas, 480 repetidas · 180: 640 filas, 160 nuevas, 480 repetidas · 33: 560 filas, 140 nuevas, 420 repetidas · 230: 552 filas, 138 nuevas, 414 repetidas · 210: 526 filas, 130 nuevas, 396 repetidas · 306: 504 filas, 126 nuevas, 378 repetidas · 301: 488 filas, 122 nuevas, 366 repetidas",
+      "ultimo_fetch_bueno": "2026-11-26T22:04:22+00:00",
+      "ultimo_intento": "2026-11-26T22:04:22+00:00"
     }
   }
 }
