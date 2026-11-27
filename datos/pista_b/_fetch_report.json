@@ -1,21 +1,21 @@
 {
-  "actualizado_en": "2026-11-26T22:04:22+00:00",
+  "actualizado_en": "2026-11-27T21:46:30+00:00",
   "fuentes": {
     "FICEDA_CDMX": {
       "critical": true,
-      "filas_ultimo_fetch": 80,
+      "filas_ultimo_fetch": 0,
       "nombre": "Central de Abasto de la Ciudad de Mexico · FICEDA",
-      "ultimo_detalle": "80 filas, 80 nuevas, 0 repetidas, corte 2026-11-26",
-      "ultimo_fetch_bueno": "2026-11-26T22:04:22+00:00",
-      "ultimo_intento": "2026-11-26T22:04:22+00:00"
+      "ultimo_detalle": "80 filas, 0 nuevas, 80 repetidas, corte 2026-11-26",
+      "ultimo_fetch_bueno": "2026-11-27T21:46:30+00:00",
+      "ultimo_intento": "2026-11-27T21:46:30+00:00"
     },
     "SNIIM_FYH": {
       "critical": true,
       "filas_ultimo_fetch": 4266,
       "nombre": "SNIIM · Secretaria de Economia, frutas y hortalizas",
-      "ultimo_detalle": "190: 747 filas, 186 nuevas, 561 repetidas · 140: 704 filas, 182 nuevas, 522 repetidas · 160: 680 filas, 170 nuevas, 510 repetidas · 141: 672 filas, 168 nuevas, 504 repetidas · 100: 640 filas, 160 nuevas, 480 repetidas · 181: 640 filas, 160 nuevas, 480 repetidas · 180: 640 filas, 160 nuevas, 480 repetidas · 33: 560 filas, 140 nuevas, 420 repetidas · 230: 552 filas, 138 nuevas, 414 repetidas · 210: 526 filas, 130 nuevas, 396 repetidas · 306: 504 filas, 126 nuevas, 378 repetidas · 301: 488 filas, 122 nuevas, 366 repetidas",
+      "ultimo_detalle": "190: 840 filas, 93 nuevas, 747 repetidas · 140: 792 filas, 88 nuevas, 704 repetidas · 160: 765 filas, 85 nuevas, 680 repetidas · 141: 756 filas, 84 nuevas, 672 repetidas · 100: 720 filas, 80 nuevas, 640 repetidas · 181: 720 filas, 80 nuevas, 640 repetidas · 180: 720 filas, 80 nuevas, 640 repetidas · 33: 630 filas, 70 nuevas, 560 repetidas · 230: 621 filas, 69 nuevas, 552 repetidas · 210: 591 filas, 65 nuevas, 526 repetidas · 306: 567 filas, 63 nuevas, 504 repetidas · 301: 549 filas, 61 nuevas, 488 repetidas",
       "ultimo_fetch_bueno": "2026-11-26T22:04:22+00:00",
-      "ultimo_intento": "2026-11-26T22:04:22+00:00"
+      "ultimo_intento": "2026-11-27T21:46:30+00:00"
     }
   }
 }
